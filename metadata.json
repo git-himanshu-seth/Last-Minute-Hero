@@ -1,0 +1,6 @@
+{
+  "name": "Last Minute Life Saver",
+  "description": "An AI-powered collaborative productivity companion that predicts deadline risks, manages group sprints, facilitates simulated and AI-guided chats, and automates daily standups to help teams deliver on time.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

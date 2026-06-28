@@ -1,0 +1,238 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account profile and settings",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "photoUrl": { "type": "string" },
+        "productivityScore": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "email", "productivityScore"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "A user-created task with productivity metrics",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "priority": { "type": "string" },
+        "category": { "type": "string" },
+        "status": { "type": "string" },
+        "deadline": { "type": "string" },
+        "estimatedHours": { "type": "number" },
+        "completedHours": { "type": "number" },
+        "urgency": { "type": "number" },
+        "impact": { "type": "number" },
+        "userImportance": { "type": "number" },
+        "riskLevel": { "type": "string" },
+        "riskScore": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "title", "status", "createdAt"]
+    },
+    "Goal": {
+      "title": "Goal",
+      "description": "User goals linked to categories",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "type": { "type": "string" },
+        "targetDate": { "type": "string" },
+        "progress": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "title", "progress", "createdAt"]
+    },
+    "Habit": {
+      "title": "Habit",
+      "description": "Habits to build consistency",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "streak": { "type": "number" },
+        "consistencyScore": { "type": "number" },
+        "completions": { "type": "array" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "title", "streak", "consistencyScore", "completions", "createdAt"]
+    },
+    "DailyPlan": {
+      "title": "DailyPlan",
+      "description": "A generated schedule or plan for a day",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "date": { "type": "string" },
+        "tasks": { "type": "array" },
+        "focusHours": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "date", "tasks", "focusHours", "createdAt"]
+    },
+    "ProductivityReport": {
+      "title": "ProductivityReport",
+      "description": "AI generated productivity insights",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "score": { "type": "number" },
+        "strengths": { "type": "array" },
+        "weaknesses": { "type": "array" },
+        "suggestions": { "type": "array" },
+        "generatedAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "score", "generatedAt"]
+    },
+    "AppNotification": {
+      "title": "AppNotification",
+      "description": "System or rescue alerts for the user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "message", "type", "read", "createdAt"]
+    },
+    "Group": {
+      "title": "Group",
+      "description": "Collaboration study, startup or project team workspace",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "owner": { "type": "string" },
+        "members": { "type": "array" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "category", "owner", "members", "createdAt"]
+    },
+    "GroupTask": {
+      "title": "GroupTask",
+      "description": "Shared task within a group workspace",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "groupId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "assignedTo": { "type": "string" },
+        "priority": { "type": "string" },
+        "status": { "type": "string" },
+        "deadline": { "type": "string" },
+        "progress": { "type": "number" }
+      },
+      "required": ["id", "groupId", "title", "assignedTo", "priority", "status", "deadline", "progress"]
+    },
+    "GroupGoal": {
+      "title": "GroupGoal",
+      "description": "Strategic milestone within a group workspace",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "groupId": { "type": "string" },
+        "title": { "type": "string" },
+        "targetDate": { "type": "string" },
+        "progress": { "type": "number" },
+        "milestones": { "type": "array" }
+      },
+      "required": ["id", "groupId", "title", "targetDate", "progress", "milestones"]
+    },
+    "Channel": {
+      "title": "Channel",
+      "description": "Discussion channels inside a group workspace",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "groupId": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string" }
+      },
+      "required": ["id", "groupId", "name", "type"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Real-time discussion messages",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "channelId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "senderAvatar": { "type": "string" },
+        "isAI": { "type": "boolean" },
+        "content": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "channelId", "senderName", "isAI", "content", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile document"
+    },
+    "/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "User tasks"
+    },
+    "/goals/{goalId}": {
+      "schema": "Goal",
+      "description": "User goals"
+    },
+    "/habits/{habitId}": {
+      "schema": "Habit",
+      "description": "User habits"
+    },
+    "/dailyPlans/{planId}": {
+      "schema": "DailyPlan",
+      "description": "Daily schedule planning"
+    },
+    "/productivityReports/{reportId}": {
+      "schema": "ProductivityReport",
+      "description": "User reports"
+    },
+    "/notifications/{notifId}": {
+      "schema": "AppNotification",
+      "description": "User notifications"
+    },
+    "/groups/{groupId}": {
+      "schema": "Group",
+      "description": "Workspace groups"
+    },
+    "/groups/{groupId}/tasks/{taskId}": {
+      "schema": "GroupTask",
+      "description": "Workspace shared tasks"
+    },
+    "/groups/{groupId}/goals/{goalId}": {
+      "schema": "GroupGoal",
+      "description": "Workspace shared goals"
+    },
+    "/groups/{groupId}/channels/{channelId}": {
+      "schema": "Channel",
+      "description": "Workspace channels"
+    },
+    "/groups/{groupId}/channels/{channelId}/messages/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Workspace channel messages"
+    }
+  }
+}

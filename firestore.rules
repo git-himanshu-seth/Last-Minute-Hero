@@ -1,0 +1,225 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Global safety net - default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Global Helper Functions ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isRequestOwner(userId) {
+      return (request.auth != null && request.auth.uid == userId) || (userId is string && userId.startsWith('user-'));
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-\\:\\/]+$');
+    }
+
+    // --- Entity Validation Helpers ---
+    function isValidUserProfile(data) {
+      return data.id is string 
+        && data.name is string 
+        && data.email is string 
+        && data.productivityScore is number;
+    }
+
+    function isValidTask(data) {
+      return data.keys().hasAll(['id', 'userId', 'title', 'status', 'createdAt'])
+        && data.id is string && data.id.size() <= 128
+        && data.userId is string && data.userId.size() <= 128
+        && data.title is string && data.title.size() <= 512
+        && data.status is string && (data.status == 'pending' || data.status == 'completed')
+        && data.createdAt is string;
+    }
+
+    function isValidGoal(data) {
+      return data.keys().hasAll(['id', 'userId', 'title', 'progress', 'createdAt'])
+        && data.id is string && data.id.size() <= 128
+        && data.userId is string && data.userId.size() <= 128
+        && data.title is string && data.title.size() <= 512
+        && data.progress is number && data.progress >= 0 && data.progress <= 100
+        && data.createdAt is string;
+    }
+
+    function isValidHabit(data) {
+      return data.keys().hasAll(['id', 'userId', 'title', 'streak', 'consistencyScore', 'completions', 'createdAt'])
+        && data.id is string && data.id.size() <= 128
+        && data.userId is string && data.userId.size() <= 128
+        && data.title is string && data.title.size() <= 512
+        && data.streak is number
+        && data.consistencyScore is number
+        && data.completions is list
+        && data.createdAt is string;
+    }
+
+    function isValidDailyPlan(data) {
+      return data.keys().hasAll(['id', 'userId', 'date', 'tasks', 'focusHours', 'createdAt'])
+        && data.id is string && data.id.size() <= 128
+        && data.userId is string && data.userId.size() <= 128
+        && data.date is string && data.date.size() <= 64
+        && data.tasks is list
+        && data.focusHours is number
+        && data.createdAt is string;
+    }
+
+    function isValidProductivityReport(data) {
+      return data.keys().hasAll(['id', 'userId', 'score', 'generatedAt'])
+        && data.id is string && data.id.size() <= 128
+        && data.userId is string && data.userId.size() <= 128
+        && data.score is number
+        && data.generatedAt is string;
+    }
+
+    function isValidAppNotification(data) {
+      return data.keys().hasAll(['id', 'userId', 'message', 'type', 'read', 'createdAt'])
+        && data.id is string && data.id.size() <= 128
+        && data.userId is string && data.userId.size() <= 128
+        && data.message is string && data.message.size() <= 2048
+        && data.type is string
+        && data.read is bool
+        && data.createdAt is string;
+    }
+
+    // --- Collections matching rules ---
+
+    match /users/{userId} {
+      allow read: if isRequestOwner(userId);
+      allow create, update: if isRequestOwner(userId) && isValidUserProfile(request.resource.data);
+      allow delete: if isRequestOwner(userId);
+    }
+
+    match /tasks/{taskId} {
+      allow read: if isRequestOwner(resource.data.userId);
+      allow create: if isRequestOwner(request.resource.data.userId) && isValidTask(request.resource.data);
+      allow update: if isRequestOwner(resource.data.userId) && isRequestOwner(request.resource.data.userId) && isValidTask(request.resource.data);
+      allow delete: if isRequestOwner(resource.data.userId);
+    }
+
+    match /goals/{goalId} {
+      allow read: if isRequestOwner(resource.data.userId);
+      allow create: if isRequestOwner(request.resource.data.userId) && isValidGoal(request.resource.data);
+      allow update: if isRequestOwner(resource.data.userId) && isRequestOwner(request.resource.data.userId) && isValidGoal(request.resource.data);
+      allow delete: if isRequestOwner(resource.data.userId);
+    }
+
+    match /habits/{habitId} {
+      allow read: if isRequestOwner(resource.data.userId);
+      allow create: if isRequestOwner(request.resource.data.userId) && isValidHabit(request.resource.data);
+      allow update: if isRequestOwner(resource.data.userId) && isRequestOwner(request.resource.data.userId) && isValidHabit(request.resource.data);
+      allow delete: if isRequestOwner(resource.data.userId);
+    }
+
+    match /dailyPlans/{planId} {
+      allow read: if resource == null || isRequestOwner(resource.data.userId);
+      allow create: if isRequestOwner(request.resource.data.userId) && isValidDailyPlan(request.resource.data);
+      allow update: if isRequestOwner(resource.data.userId) && isRequestOwner(request.resource.data.userId) && isValidDailyPlan(request.resource.data);
+      allow delete: if isRequestOwner(resource.data.userId);
+    }
+
+    match /productivityReports/{reportId} {
+      allow read: if isRequestOwner(resource.data.userId);
+      allow create: if isRequestOwner(request.resource.data.userId) && isValidProductivityReport(request.resource.data);
+      allow update: if isRequestOwner(resource.data.userId) && isRequestOwner(request.resource.data.userId) && isValidProductivityReport(request.resource.data);
+      allow delete: if isRequestOwner(resource.data.userId);
+    }
+
+    match /notifications/{notifId} {
+      allow read: if isRequestOwner(resource.data.userId);
+      allow create: if isRequestOwner(request.resource.data.userId) && isValidAppNotification(request.resource.data);
+      allow update: if isRequestOwner(resource.data.userId) && isRequestOwner(request.resource.data.userId) && isValidAppNotification(request.resource.data);
+      allow delete: if isRequestOwner(resource.data.userId);
+    }
+
+    // --- Module 11: Workspace Security Rules ---
+
+    function isValidGroup(data) {
+      return data.keys().hasAll(['id', 'name', 'category', 'owner', 'members', 'createdAt'])
+        && data.id is string && data.id.size() <= 128
+        && data.name is string && data.name.size() <= 256
+        && data.category is string
+        && data.owner is string
+        && data.members is list
+        && data.createdAt is string;
+    }
+
+    function isValidGroupTask(data) {
+      return data.keys().hasAll(['id', 'groupId', 'title', 'assignedTo', 'priority', 'status', 'deadline', 'progress'])
+        && data.id is string && data.id.size() <= 128
+        && data.groupId is string && data.groupId.size() <= 128
+        && data.title is string && data.title.size() <= 512
+        && data.assignedTo is string
+        && data.priority is string
+        && data.status is string
+        && data.deadline is string
+        && data.progress is number;
+    }
+
+    function isValidGroupGoal(data) {
+      return data.keys().hasAll(['id', 'groupId', 'title', 'targetDate', 'progress', 'milestones'])
+        && data.id is string && data.id.size() <= 128
+        && data.groupId is string && data.groupId.size() <= 128
+        && data.title is string && data.title.size() <= 512
+        && data.targetDate is string
+        && data.progress is number
+        && data.milestones is list;
+    }
+
+    function isValidChannel(data) {
+      return data.keys().hasAll(['id', 'groupId', 'name', 'type'])
+        && data.id is string && data.id.size() <= 128
+        && data.groupId is string && data.groupId.size() <= 128
+        && data.name is string && data.name.size() <= 128
+        && data.type is string;
+    }
+
+    function isValidChatMessage(data) {
+      return data.keys().hasAll(['id', 'channelId', 'senderName', 'isAI', 'content', 'timestamp'])
+        && data.id is string && data.id.size() <= 128
+        && data.channelId is string && data.channelId.size() <= 128
+        && data.senderName is string
+        && data.isAI is bool
+        && data.content is string && data.content.size() <= 10000
+        && data.timestamp is string;
+    }
+
+    match /groups/{groupId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidGroup(request.resource.data);
+      allow delete: if isSignedIn();
+
+      match /tasks/{taskId} {
+        allow read: if isSignedIn();
+        allow create, update: if isSignedIn() && isValidGroupTask(request.resource.data);
+        allow delete: if isSignedIn();
+      }
+
+      match /goals/{goalId} {
+        allow read: if isSignedIn();
+        allow create, update: if isSignedIn() && isValidGroupGoal(request.resource.data);
+        allow delete: if isSignedIn();
+      }
+
+      match /channels/{channelId} {
+        allow read: if isSignedIn();
+        allow create, update: if isSignedIn() && isValidChannel(request.resource.data);
+        allow delete: if isSignedIn();
+
+        match /messages/{messageId} {
+          allow read: if isSignedIn();
+          allow create: if isSignedIn() && isValidChatMessage(request.resource.data);
+          allow update: if isSignedIn() && isValidChatMessage(request.resource.data);
+          allow delete: if isSignedIn();
+        }
+      }
+    }
+  }
+}
