@@ -89,6 +89,16 @@ service cloud.firestore {
         && data.createdAt is string;
     }
 
+    function isValidStrategyPlan(data) {
+      return data.id is string
+        && data.userId is string
+        && data.name is string
+        && data.nodes is list
+        && data.edges is list
+        && data.createdAt is string
+        && data.updatedAt is string;
+    }
+
     // --- Collections matching rules ---
 
     match /users/{userId} {
@@ -139,6 +149,13 @@ service cloud.firestore {
       allow delete: if isRequestOwner(resource.data.userId);
     }
 
+    match /strategyPlans/{planId} {
+      allow read: if isRequestOwner(resource.data.userId);
+      allow create: if isRequestOwner(request.resource.data.userId) && isValidStrategyPlan(request.resource.data);
+      allow update: if isRequestOwner(resource.data.userId) && isRequestOwner(request.resource.data.userId) && isValidStrategyPlan(request.resource.data);
+      allow delete: if isRequestOwner(resource.data.userId);
+    }
+
     // --- Module 11: Workspace Security Rules ---
 
     function isValidGroup(data) {
@@ -182,10 +199,11 @@ service cloud.firestore {
     }
 
     function isValidChatMessage(data) {
-      return data.keys().hasAll(['id', 'channelId', 'senderName', 'isAI', 'content', 'timestamp'])
+      return data.keys().hasAll(['id', 'channelId', 'senderName', 'senderAvatar', 'isAI', 'content', 'timestamp'])
         && data.id is string && data.id.size() <= 128
         && data.channelId is string && data.channelId.size() <= 128
         && data.senderName is string
+        && data.senderAvatar is string
         && data.isAI is bool
         && data.content is string && data.content.size() <= 10000
         && data.timestamp is string;

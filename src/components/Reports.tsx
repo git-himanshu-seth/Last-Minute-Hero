@@ -22,14 +22,14 @@ export const Reports: React.FC = () => {
       {/* Title */}
       <div className="flex justify-between items-center">
         <div className="space-y-1">
-          <h2 className="font-display text-2xl font-bold text-white tracking-tight">AI Productivity Coach</h2>
-          <p className="text-gray-400 text-xs sm:text-sm">Continuous analysis of your scheduling execution, habits compliance, and deadline recovery speeds.</p>
+          <h2 className="font-display text-2xl font-bold text-primary-text tracking-tight">AI Productivity Coach</h2>
+          <p className="text-secondary-text text-xs sm:text-sm">Continuous analysis of your scheduling execution, habits compliance, and deadline recovery speeds.</p>
         </div>
         <button 
           id="compile-report-btn"
           onClick={handleCompile}
           disabled={loading}
-          className="px-4 py-2.5 rounded-xl bg-orange-500 text-white font-semibold text-xs hover:opacity-95 transition disabled:opacity-50 flex items-center space-x-1.5"
+          className="px-4 py-2.5 rounded-xl bg-accent text-black font-semibold text-xs hover:opacity-95 transition disabled:opacity-50 flex items-center space-x-1.5"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           <span>{loading ? "Analyzing behavior..." : "Compile Report"}</span>
@@ -40,10 +40,10 @@ export const Reports: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Left Block (Performance Score) */}
-          <div className="glass-panel p-6 rounded-2xl border-white/5 space-y-4 flex flex-col justify-between">
+          <div className="glass-panel p-6 rounded-2xl border-border-main space-y-4 flex flex-col justify-between">
             <div className="space-y-1">
-              <span className="text-xs text-gray-500 font-mono font-bold uppercase tracking-wider">Productivity Index</span>
-              <h3 className="font-display font-bold text-white text-base">Weekly Rating</h3>
+              <span className="text-xs text-secondary-text font-mono font-bold uppercase tracking-wider">Productivity Index</span>
+              <h3 className="font-display font-bold text-primary-text text-base">Weekly Rating</h3>
             </div>
 
             <div className="py-6 flex flex-col items-center justify-center space-y-3 relative">
@@ -55,7 +55,7 @@ export const Reports: React.FC = () => {
                     cx="72" 
                     cy="72" 
                     r="64" 
-                    stroke="url(#gradient)" 
+                    stroke="var(--accent)" 
                     strokeWidth="8" 
                     fill="transparent" 
                     strokeDasharray={402}
@@ -65,15 +65,14 @@ export const Reports: React.FC = () => {
                   />
                   <defs>
                     <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#ef4444" />
-                      <stop offset="50%" stopColor="#f97316" />
-                      <stop offset="100%" stopColor="#f59e0b" />
+                      <stop offset="0%" stopColor="var(--accent)" />
+                      <stop offset="100%" stopColor="var(--accent)" />
                     </linearGradient>
                   </defs>
                 </svg>
                 <div className="absolute text-center">
-                  <span className="font-display text-4xl font-bold text-white tracking-tighter">{report.score}%</span>
-                  <div className="text-[9px] text-gray-500 font-mono font-bold uppercase tracking-wider mt-0.5">Focus Grade</div>
+                  <span className="font-display text-4xl font-bold text-primary-text tracking-tighter">{report.score}%</span>
+                  <div className="text-[9px] text-secondary-text font-mono font-bold uppercase tracking-wider mt-0.5">Focus Grade</div>
                 </div>
               </div>
             </div>

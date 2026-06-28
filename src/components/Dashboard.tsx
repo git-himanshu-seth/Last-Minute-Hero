@@ -82,13 +82,13 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Welcome Banner */}
-      <div className="glass-panel p-6 sm:p-8 rounded-2xl border-white/5 relative overflow-hidden flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+      <div className="glass-panel p-6 sm:p-8 rounded-2xl border-border-main relative overflow-hidden flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div className="absolute top-0 right-0 w-[300px] h-full bg-gradient-to-l from-red-500/5 to-transparent pointer-events-none" />
         <div className="space-y-1 relative z-10">
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          <h2 className="font-display text-2xl sm:text-3xl font-bold text-primary-text tracking-tight">
             Welcome back, {user?.name.split(' ')[0]}
           </h2>
-          <p className="text-gray-400 text-xs sm:text-sm">
+          <p className="text-secondary-text text-xs sm:text-sm">
             {criticalTasks.length > 0 
               ? `You have ${criticalTasks.length} deadlines at severe risk today. Let's finish them.` 
               : "All clear! No critical deadline risks currently detected."}
@@ -98,14 +98,14 @@ export const Dashboard: React.FC = () => {
           <button 
             id="capture-task-dash-btn"
             onClick={() => setActiveTab('tasks')}
-            className="px-4.5 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 text-white font-medium text-xs shadow-lg shadow-red-500/10 hover:opacity-95 transition"
+            className="px-4.5 py-2.5 rounded-xl bg-accent text-black font-bold text-xs shadow-lg shadow-accent/20 hover:opacity-95 transition"
           >
             Capture Task
           </button>
           <button 
             id="talk-ai-coach-dash-btn"
             onClick={() => setActiveTab('reports')}
-            className="px-4.5 py-2.5 rounded-xl bg-gray-800 text-white font-medium text-xs border border-gray-700/50 hover:bg-gray-750 transition"
+            className="px-4.5 py-2.5 rounded-xl bg-surface text-primary-text font-medium text-xs border border-border-main hover:opacity-80 transition"
           >
             Talk to Coach
           </button>
@@ -115,11 +115,11 @@ export const Dashboard: React.FC = () => {
       {/* Grid of Key Analytical Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1 */}
-        <div className="glass-panel p-5 rounded-xl border-white/5 relative overflow-hidden">
+        <div className="glass-panel p-5 rounded-xl border-border-main relative overflow-hidden">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
-              <span className="text-gray-400 text-xs font-medium">Productivity Score</span>
-              <div className="font-display text-2xl font-bold text-white">{user?.productivityScore || 75}</div>
+              <span className="text-secondary-text text-xs font-medium">Productivity Score</span>
+              <div className="font-display text-2xl font-bold text-primary-text">{user?.productivityScore || 75}</div>
             </div>
             <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
               <TrendingUp className="w-5 h-5" />
@@ -131,44 +131,44 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Metric 2 */}
-        <div className="glass-panel p-5 rounded-xl border-white/5 relative overflow-hidden">
+        <div className="glass-panel p-5 rounded-xl border-border-main relative overflow-hidden">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
-              <span className="text-gray-400 text-xs font-medium">Deadline Risk Index</span>
-              <div className="font-display text-2xl font-bold text-white">{riskPercent}%</div>
+              <span className="text-secondary-text text-xs font-medium">Deadline Risk Index</span>
+              <div className="font-display text-2xl font-bold text-primary-text">{riskPercent}%</div>
             </div>
             <div className={`p-2.5 rounded-lg ${riskPercent > 50 ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>
               <AlertTriangle className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-4 flex items-center space-x-1.5 text-[10px] text-gray-400">
+          <div className="mt-4 flex items-center space-x-1.5 text-[10px] text-secondary-text">
             <span className={`w-1.5 h-1.5 rounded-full ${riskPercent > 50 ? 'bg-red-500 animate-ping' : 'bg-amber-500'}`} />
             <span>{criticalTasks.length} urgent task alerts active</span>
           </div>
         </div>
 
         {/* Metric 3 */}
-        <div className="glass-panel p-5 rounded-xl border-white/5 relative overflow-hidden">
+        <div className="glass-panel p-5 rounded-xl border-border-main relative overflow-hidden">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
-              <span className="text-gray-400 text-xs font-medium">Completed Tasks</span>
-              <div className="font-display text-2xl font-bold text-white">{completedCount}</div>
+              <span className="text-secondary-text text-xs font-medium">Completed Tasks</span>
+              <div className="font-display text-2xl font-bold text-primary-text">{completedCount}</div>
             </div>
             <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400">
               <CheckCircle className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-4 flex items-center space-x-1.5 text-[10px] text-gray-400">
+          <div className="mt-4 flex items-center space-x-1.5 text-[10px] text-secondary-text">
             <span>Total of {tasks.length} tasks registered</span>
           </div>
         </div>
 
         {/* Metric 4 */}
-        <div className="glass-panel p-5 rounded-xl border-white/5 relative overflow-hidden">
+        <div className="glass-panel p-5 rounded-xl border-border-main relative overflow-hidden">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
-              <span className="text-gray-400 text-xs font-medium">Active Habit Streaks</span>
-              <div className="font-display text-2xl font-bold text-white">
+              <span className="text-secondary-text text-xs font-medium">Active Habit Streaks</span>
+              <div className="font-display text-2xl font-bold text-primary-text">
                 {habits.length > 0 ? Math.max(...habits.map((h) => h.streak), 0) : 0} Days
               </div>
             </div>
@@ -176,7 +176,7 @@ export const Dashboard: React.FC = () => {
               <Flame className="w-5 h-5 animate-pulse" />
             </div>
           </div>
-          <div className="mt-4 flex items-center space-x-1.5 text-[10px] text-gray-400">
+          <div className="mt-4 flex items-center space-x-1.5 text-[10px] text-secondary-text">
             <span>Across {habits.length} tracked routines</span>
           </div>
         </div>
@@ -189,17 +189,17 @@ export const Dashboard: React.FC = () => {
         <div className="lg:col-span-2 space-y-6">
           
           {/* Section: Today's Mission Scheduler */}
-          <div className="glass-panel p-6 rounded-2xl border-white/5 space-y-4">
+          <div className="glass-panel p-6 rounded-2xl border-border-main space-y-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">
-                <Calendar className="w-4.5 h-4.5 text-orange-400" />
-                <h3 className="font-display font-bold text-white text-base">Today's Mission</h3>
+                <Calendar className="w-4.5 h-4.5 text-accent" />
+                <h3 className="font-display font-bold text-primary-text text-base">Today's Mission</h3>
               </div>
               <button 
                 id="generate-plan-dash-btn"
                 onClick={handleGeneratePlan}
                 disabled={loadingPlan}
-                className="flex items-center space-x-1.5 text-xs text-orange-400 hover:text-orange-300 font-medium transition disabled:opacity-50"
+                className="flex items-center space-x-1.5 text-xs text-accent hover:opacity-80 font-medium transition disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${loadingPlan ? 'animate-spin' : ''}`} />
                 <span>{dailyPlan ? 'Reschedule' : 'Generate Daily Plan'}</span>
@@ -208,39 +208,39 @@ export const Dashboard: React.FC = () => {
 
             {loadingPlan ? (
               <div className="py-12 flex flex-col items-center justify-center space-y-3">
-                <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-                <span className="text-xs text-gray-400 font-mono">Gemini AI is scheduling your day...</span>
+                <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                <span className="text-xs text-secondary-text font-mono">Gemini AI is scheduling your day...</span>
               </div>
             ) : dailyPlan ? (
               <div className="space-y-3">
-                <div className="grid grid-cols-5 text-[10px] text-gray-500 font-mono uppercase tracking-wider border-b border-white/5 pb-2">
+                <div className="grid grid-cols-5 text-[10px] text-secondary-text font-mono uppercase tracking-wider border-b border-border-main pb-2">
                   <div className="col-span-1">Time slot</div>
                   <div className="col-span-3">Mission item</div>
                   <div className="col-span-1 text-right">Hours</div>
                 </div>
-                <div className="divide-y divide-white/5">
+                <div className="divide-y divide-border-main">
                   {dailyPlan.tasks.map((slot, idx) => (
                     <div key={idx} className="grid grid-cols-5 py-3 text-xs items-center hover:bg-white/[0.01] transition">
-                      <div className="col-span-1 font-mono text-orange-400 font-medium">{slot.time}</div>
-                      <div className="col-span-3 text-gray-200 font-medium">{slot.taskTitle}</div>
-                      <div className="col-span-1 text-right font-mono text-gray-400">{slot.durationHours}h</div>
+                      <div className="col-span-1 font-mono text-accent font-medium">{slot.time}</div>
+                      <div className="col-span-3 text-primary-text font-medium">{slot.taskTitle}</div>
+                      <div className="col-span-1 text-right font-mono text-secondary-text">{slot.durationHours}h</div>
                     </div>
                   ))}
                 </div>
-                <div className="flex justify-between items-center pt-2 border-t border-white/5 text-[11px] text-gray-400">
+                <div className="flex justify-between items-center pt-2 border-t border-border-main text-[11px] text-secondary-text">
                   <span>Total Planned Focus Time</span>
-                  <span className="font-mono font-bold text-white text-xs">{dailyPlan.focusHours} Hours</span>
+                  <span className="font-mono font-bold text-primary-text text-xs">{dailyPlan.focusHours} Hours</span>
                 </div>
               </div>
             ) : (
               <div className="py-10 text-center space-y-3.5">
-                <p className="text-gray-400 text-xs max-w-sm mx-auto leading-relaxed">
+                <p className="text-secondary-text text-xs max-w-sm mx-auto leading-relaxed">
                   You haven't generated today's timeline yet. Let Gemini calculate a burnout-free mission map based on your pending tasks.
                 </p>
                 <button 
                   id="generate-plan-dash-empty-btn"
                   onClick={handleGeneratePlan}
-                  className="px-4 py-2 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400 font-semibold text-xs hover:bg-orange-500/15 transition"
+                  className="px-4 py-2 rounded-lg bg-accent/10 border border-accent/20 text-accent font-semibold text-xs hover:bg-accent/15 transition"
                 >
                   Generate Mission Map
                 </button>
@@ -249,10 +249,10 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* Section: Critical Deadlines at Risk */}
-          <div className="glass-panel p-6 rounded-2xl border-white/5 space-y-4">
+          <div className="glass-panel p-6 rounded-2xl border-border-main space-y-4">
             <div className="flex items-center space-x-2">
               <AlertTriangle className="w-4.5 h-4.5 text-red-400" />
-              <h3 className="font-display font-bold text-white text-base">Critical Deadlines at Risk</h3>
+              <h3 className="font-display font-bold text-primary-text text-base">Critical Deadlines at Risk</h3>
             </div>
 
             {criticalTasks.length > 0 ? (
@@ -267,21 +267,21 @@ export const Dashboard: React.FC = () => {
                         <span className="text-[10px] text-red-400 font-mono font-semibold uppercase tracking-wider">
                           Critical risk (Score: {task.riskScore})
                         </span>
-                        <h4 className="font-display font-bold text-white text-sm sm:text-base leading-snug">
+                        <h4 className="font-display font-bold text-primary-text text-sm sm:text-base leading-snug">
                           {task.title}
                         </h4>
                       </div>
                       <div className="text-right text-xs">
-                        <span className="text-gray-400">Due:</span>
-                        <div className="font-mono text-white font-medium mt-0.5">
+                        <span className="text-secondary-text">Due:</span>
+                        <div className="font-mono text-primary-text font-medium mt-0.5">
                           {new Date(task.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between text-xs pt-1 border-t border-red-500/10">
-                      <div className="text-gray-400">
-                        Remaining Work: <span className="font-mono text-white font-semibold">{task.estimatedHours - task.completedHours}h</span>
+                      <div className="text-secondary-text">
+                        Remaining Work: <span className="font-mono text-primary-text font-semibold">{task.estimatedHours - task.completedHours}h</span>
                       </div>
                       <div className="flex space-x-2">
                         <button 

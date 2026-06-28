@@ -31,8 +31,12 @@ import {
   Check,
   Menu,
   ShieldCheck,
-  Users
+  Users,
+  Network,
+  Monitor
 } from 'lucide-react';
+import { DiagramPlanner } from './components/DiagramPlanner';
+import { ThemeSwitcher } from './components/ThemeSwitcher';
 
 interface SidebarNavigationProps {
   isOpen: boolean;
@@ -49,28 +53,30 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ isOpen, onClose }
     { id: 'tasks', label: 'AI Task Manager', icon: CheckSquare },
     { id: 'calendar', label: 'Mission Calendar', icon: CalendarDays },
     { id: 'goals', label: 'Milestones', icon: Target },
+    { id: 'planner', label: 'Diagram Planner', icon: Network },
     { id: 'habits', label: 'Smart Habits', icon: Flame },
     { id: 'reports', label: 'Productivity Coach', icon: BrainCircuit },
     { id: 'voice', label: 'Voice Assistant', icon: Volume2 },
-    { id: 'diagnostics', label: 'API Monitor & Tests', icon: ShieldCheck },
+    { id: 'appearance', label: 'Appearance', icon: Monitor },
+    ...((import.meta as any).env?.DEV ? [{ id: 'diagnostics', label: 'API Monitor & Tests', icon: ShieldCheck }] : []),
     { id: 'settings', label: 'Settings', icon: SettingsIcon },
   ];
 
   const unreadNotifs = notifications.filter(n => !n.read);
 
   return (
-    <div className={`fixed inset-y-0 left-0 z-50 md:static md:translate-x-0 flex flex-col h-screen w-64 bg-[#080808] border-r border-white/5 text-slate-400 font-sans shrink-0 transition-transform duration-300 ease-in-out ${
+    <div className={`fixed inset-y-0 left-0 z-50 md:static md:translate-x-0 flex flex-col h-screen w-64 bg-sidebar-bg border-r border-border-main text-secondary-text font-sans shrink-0 transition-transform duration-300 ease-in-out ${
       isOpen ? 'translate-x-0' : '-translate-x-full'
     }`}>
       {/* Sidebar Header Brand */}
-      <div className="p-5.5 border-b border-white/5 flex items-center justify-between">
+      <div className="p-5.5 border-b border-border-main flex items-center justify-between">
         <div className="flex items-center space-x-2.5">
           <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center font-bold text-black shadow-md shadow-red-500/10 shrink-0">
             !
           </div>
-          <span className="font-display font-semibold text-sm tracking-tight text-white leading-tight">
+          <span className="font-display font-semibold text-sm tracking-tight text-[var(--text-primary)] leading-tight">
             Lifesaver AI<br/>
-            <span className="text-slate-500 font-medium text-[10px]">Command Center</span>
+            <span className="text-[var(--text-secondary)] font-medium text-[10px]">Command Center</span>
           </span>
         </div>
 
@@ -78,7 +84,7 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ isOpen, onClose }
           {/* Close button for mobile/tablet */}
           <button 
             onClick={onClose}
-            className="p-1.5 rounded-lg border border-white/5 hover:bg-white/[0.04] text-slate-400 hover:text-white transition md:hidden"
+            className="p-1.5 rounded-lg border border-border-main hover:bg-white/[0.04] text-secondary-text hover:text-primary-text transition md:hidden"
             title="Close Menu"
           >
             <X className="w-4 h-4" />
@@ -89,7 +95,7 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ isOpen, onClose }
             <button 
               id="notif-bell-btn"
               onClick={() => setShowNotifications(!showNotifications)}
-              className="p-1.5 rounded-lg border border-white/5 hover:bg-white/[0.04] text-slate-400 hover:text-white transition relative"
+              className="p-1.5 rounded-lg border border-border-main hover:bg-white/[0.04] text-secondary-text hover:text-primary-text transition relative"
             >
               <Bell className="w-4 h-4" />
               {unreadNotifs.length > 0 && (
@@ -99,10 +105,10 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ isOpen, onClose }
 
             {/* Notifications Dropdown Drawer */}
             {showNotifications && (
-              <div className="absolute right-0 md:left-0 mt-2.5 w-72 bg-[#0a0a0a] border border-white/10 rounded-xl shadow-2xl p-4 z-50 space-y-3">
-                <div className="flex justify-between items-center pb-2 border-b border-white/5">
-                  <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">System Alerts</span>
-                  <button onClick={() => setShowNotifications(false)} className="text-slate-500 hover:text-white">
+              <div className="absolute right-0 md:left-0 mt-2.5 w-72 glass-panel rounded-xl shadow-2xl p-4 z-50 space-y-3">
+                <div className="flex justify-between items-center pb-2 border-b border-border-main">
+                  <span className="text-xs font-mono font-bold text-[var(--text-secondary)] uppercase tracking-wider">System Alerts</span>
+                  <button onClick={() => setShowNotifications(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -113,7 +119,7 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ isOpen, onClose }
                       <div 
                         key={notif.id} 
                         className={`p-2.5 rounded-lg text-[11px] leading-relaxed relative flex justify-between gap-2.5 ${
-                          notif.read ? 'bg-white/[0.01] text-slate-500' : 'bg-orange-500/5 border border-orange-500/10 text-slate-200 font-medium'
+                          notif.read ? 'bg-white/[0.01] text-secondary-text opacity-50' : 'bg-accent/5 border border-accent/10 text-primary-text font-medium'
                         }`}
                       >
                         <span>{notif.message}</span>
@@ -121,7 +127,7 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ isOpen, onClose }
                           <button 
                             id={`read-notif-${notif.id}`}
                             onClick={() => readNotification(notif.id)}
-                            className="text-orange-400 hover:text-orange-300 shrink-0 self-start"
+                            className="text-accent hover:opacity-80 shrink-0 self-start"
                           >
                             <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                           </button>
@@ -154,14 +160,14 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ isOpen, onClose }
               }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition ${
                 isActive 
-                  ? 'bg-amber-500/10 text-amber-300 border border-amber-500/25 font-semibold shadow-lg shadow-amber-500/5' 
+                  ? 'bg-accent/10 text-accent border border-accent/25 font-semibold shadow-lg shadow-accent/5' 
                   : item.id === 'diagnostics' 
-                    ? 'hover:bg-amber-500/5 hover:text-amber-300 text-amber-500/75 border border-dashed border-amber-500/20' 
-                    : 'hover:bg-white/5 text-slate-400 hover:text-white border border-transparent'
+                    ? 'hover:bg-accent/5 hover:text-accent text-accent/75 border border-dashed border-accent/20' 
+                    : 'hover:bg-white/5 text-secondary-text hover:text-primary-text border border-transparent'
               }`}
             >
               <div className="flex items-center space-x-3 min-w-0">
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-amber-400' : item.id === 'diagnostics' ? 'text-amber-500/70' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-accent' : item.id === 'diagnostics' ? 'text-accent/70' : 'text-secondary-text'}`} />
                 <span className="truncate">{item.label}</span>
               </div>
               {item.id === 'diagnostics' && (
@@ -175,28 +181,28 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ isOpen, onClose }
       </nav>
 
       {/* Active Rescue Banner */}
-      <div className="mx-3 mb-3 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-        <p className="text-[10px] font-semibold text-orange-400 uppercase tracking-widest mb-1">Rescue Mode Active</p>
-        <p className="text-[11px] text-orange-200/70 leading-normal">AI is actively safeguarding active milestones and deadlines.</p>
+      <div className="mx-3 mb-3 p-4 bg-accent/10 border border-accent/20 rounded-xl">
+        <p className="text-[10px] font-semibold text-accent uppercase tracking-widest mb-1">Rescue Mode Active</p>
+        <p className="text-[11px] text-primary-text/70 leading-normal">AI is actively safeguarding active milestones and deadlines.</p>
       </div>
 
       {/* Sidebar Footer User Info */}
-      <div className="p-4 border-t border-white/5 flex items-center justify-between gap-3 text-xs bg-[#050505]">
+      <div className="p-4 border-t border-border-main flex items-center justify-between gap-3 text-xs bg-sidebar-bg">
         <div className="flex items-center space-x-2.5 min-w-0">
           <img 
             src={user?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=50&h=50&fit=crop"} 
             alt="User profile" 
-            className="w-8.5 h-8.5 rounded-full object-cover border border-white/10 shrink-0"
+            className="w-8.5 h-8.5 rounded-full object-cover border border-border-main shrink-0"
           />
           <div className="min-w-0">
-            <div className="font-semibold text-white truncate">{user?.name.split(' ')[0]}</div>
-            <div className="text-[9px] font-mono text-slate-500 truncate uppercase tracking-wider">Score: {user?.productivityScore}</div>
+            <div className="font-semibold text-primary-text truncate">{user?.name.split(' ')[0]}</div>
+            <div className="text-[9px] font-mono text-secondary-text truncate uppercase tracking-wider">Score: {user?.productivityScore}</div>
           </div>
         </div>
         <button 
           id="sidebar-logout-btn"
           onClick={logout} 
-          className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 transition"
+          className="p-1.5 rounded-lg text-secondary-text hover:text-red-400 transition"
           title="Sign Out"
         >
           <LogOut className="w-4 h-4" />
@@ -223,7 +229,9 @@ const MainWorkspace: React.FC<MainWorkspaceProps> = ({ onOpenSidebar }) => {
       case 'habits': return <Habits />;
       case 'reports': return <Reports />;
       case 'voice': return <VoiceAssistant />;
-      case 'diagnostics': return <Diagnostics />;
+      case 'planner': return <DiagramPlanner />;
+      case 'appearance': return <ThemeSwitcher />;
+      case 'diagnostics': return (import.meta as any).env?.DEV ? <Diagnostics /> : <Dashboard />;
       case 'settings': return <Settings />;
       default: return <Dashboard />;
     }
@@ -237,14 +245,14 @@ const MainWorkspace: React.FC<MainWorkspaceProps> = ({ onOpenSidebar }) => {
   }, undefined as any);
 
   return (
-    <div className="flex-1 flex flex-col h-screen overflow-hidden bg-[#050505]">
+    <div className="flex-1 flex flex-col h-screen overflow-hidden bg-primary-bg">
       {/* Top Header */}
-      <header className="h-16 border-b border-white/5 flex items-center justify-between px-4 sm:px-8 bg-[#050505]/80 backdrop-blur shrink-0 z-20">
+      <header className="h-16 border-b border-border-main flex items-center justify-between px-4 sm:px-8 bg-primary-bg/80 backdrop-blur shrink-0 z-20">
         <div className="flex items-center gap-3 sm:gap-4">
           <button
             id="mobile-menu-btn"
             onClick={onOpenSidebar}
-            className="p-1.5 rounded-lg border border-white/5 hover:bg-white/[0.04] text-slate-400 hover:text-white md:hidden transition"
+            className="p-1.5 rounded-lg border border-border-main hover:bg-white/[0.04] text-secondary-text hover:text-primary-text md:hidden transition"
             title="Open Menu"
           >
             <Menu className="w-5 h-5" />
@@ -253,28 +261,28 @@ const MainWorkspace: React.FC<MainWorkspaceProps> = ({ onOpenSidebar }) => {
           <span className="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded border border-red-500/30 uppercase font-bold tracking-tight">
             Live Analysis
           </span>
-          <p className="text-xs sm:text-sm text-slate-400 hidden sm:block">
+          <p className="text-xs sm:text-sm text-secondary-text hidden sm:block">
             Next predicted risk: {' '}
             {highRiskTask ? (
-              <span className="text-white font-medium">
+              <span className="text-primary-text font-medium">
                 {highRiskTask.title} ({new Date(highRiskTask.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})
               </span>
             ) : (
-              <span className="text-slate-500 font-medium">None! Fully on track</span>
+              <span className="text-secondary-text font-medium">None! Fully on track</span>
             )}
           </p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="text-right hidden sm:block">
-            <p className="text-xs font-medium text-white">{user?.name}</p>
-            <p className="text-[10px] text-slate-500">
+            <p className="text-xs font-medium text-primary-text">{user?.name}</p>
+            <p className="text-[10px] text-secondary-text">
               Productivity Rank: {user?.productivityScore && user.productivityScore >= 80 ? 'Top 10%' : 'Top 25%'}
             </p>
           </div>
           <img 
             src={user?.photoUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=50&h=50&fit=crop"} 
             alt="Profile Avatar" 
-            className="w-8.5 h-8.5 sm:w-8 sm:h-8 rounded-full border border-white/10 object-cover"
+            className="w-8.5 h-8.5 sm:w-8 sm:h-8 rounded-full border border-border-main object-cover"
           />
         </div>
       </header>
@@ -308,7 +316,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#050505]">
+    <div className="flex h-screen overflow-hidden bg-primary-bg">
       {/* Mobile Sidebar backdrop */}
       {sidebarOpen && (
         <div 

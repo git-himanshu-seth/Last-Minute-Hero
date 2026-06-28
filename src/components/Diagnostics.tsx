@@ -568,7 +568,7 @@ assert.equal(notifications.length, 1, "Dispatched notification for high-hazard s
       endpoint: '/api/gemini/task-capture',
       status: 503,
       duration: duration1,
-      payload: JSON.stringify({ prompt: 'Create daily plan', model: 'gemini-3.5-flash' }),
+      payload: JSON.stringify({ prompt: 'Create daily plan', model: 'gemini-3.1-flash-lite' }),
       errorMsg: 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.',
       isSimulated: true
     });
@@ -582,7 +582,7 @@ assert.equal(notifications.length, 1, "Dispatched notification for high-hazard s
       endpoint: '/api/gemini/task-capture',
       status: forceFaultInjection ? 503 : 200,
       duration: duration2,
-      payload: JSON.stringify({ prompt: 'Create daily plan', model: 'gemini-flash-latest' }),
+      payload: JSON.stringify({ prompt: 'Create daily plan', model: 'gemini-3.1-flash-lite' }),
       response: forceFaultInjection 
         ? undefined 
         : JSON.stringify({ success: true, fallbackTriggered: true, plan: { title: 'Emergency Rescue Pacing', focusHours: 6 } }),
@@ -1317,7 +1317,7 @@ assert.equal(notifications.length, 1, "Dispatched notification for high-hazard s
                               {log.status === 503 && (
                                 <>
                                   <strong className="text-amber-400">Gemini High-Demand Error Fallback:</strong> The Gemini API is currently experiencing a temporary capacity spike. 
-                                  Last Minute Life Saver mitigates this automatically by intercepting the failure, performing an exponential delay backoff, and re-routing the prompt to our lighter fallback models (<code className="text-cyan-300">gemini-flash-latest</code> / <code className="text-cyan-300">gemini-3.1-flash-lite</code>). 
+                                  Last Minute Life Saver mitigates this automatically by intercepting the failure, performing an exponential delay backoff, and re-routing the prompt to our lighter fallback models (<code className="text-cyan-300">gemini-3.1-flash-lite</code> / <code className="text-cyan-300">gemini-3.1-flash-lite</code>). 
                                   This guarantees zero downtime and ensures user workflows are saved.
                                 </>
                               )}

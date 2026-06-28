@@ -12,7 +12,7 @@ import {
   onSnapshot
 } from 'firebase/firestore';
 import { db, auth } from './firebase';
-import { Task, Goal, Habit, DailyPlan, ProductivityReport, AppNotification } from '../types';
+import { Task, Goal, Habit, DailyPlan, ProductivityReport, AppNotification, StrategyPlan } from '../types';
 
 export enum OperationType {
   CREATE = 'create',
@@ -64,11 +64,27 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 // ==========================================
 // USER SYNC
 // ==========================================
-function cleanUndefined(obj: any) {
+function cleanUndefined(obj: any): any {
+  if (obj === null || obj === undefined) return obj;
+  if (Array.isArray(obj)) {
+    return obj
+      .map(v => (v && typeof v === 'object' && !(v instanceof Date)) ? cleanUndefined(v) : v)
+      .filter(v => v !== undefined && v !== null);
+  }
+  if (typeof obj !== 'object' || obj instanceof Date) return obj;
+
   const clean: any = {};
   Object.keys(obj).forEach(key => {
-    if (obj[key] !== undefined) {
-      clean[key] = obj[key];
+    const value = obj[key];
+    if (value !== undefined && value !== null) {
+      if (typeof value === 'object' && !(value instanceof Date)) {
+        const cleaned = cleanUndefined(value);
+        if (cleaned !== undefined && cleaned !== null) {
+          clean[key] = cleaned;
+        }
+      } else {
+        clean[key] = value;
+      }
     }
   });
   return clean;
@@ -130,8 +146,9 @@ export async function saveTask(task: Omit<Task, 'id'> & { id?: string }) {
   try {
     const colRef = collection(db, 'tasks');
     const docRef = task.id ? doc(colRef, task.id) : doc(colRef);
+    const cleanedTask = cleanUndefined(task);
     const data = {
-      ...task,
+      ...cleanedTask,
       id: docRef.id,
       updatedAt: new Date().toISOString()
     };
@@ -178,8 +195,9 @@ export async function saveGoal(goal: Omit<Goal, 'id'> & { id?: string }) {
   try {
     const colRef = collection(db, 'goals');
     const docRef = goal.id ? doc(colRef, goal.id) : doc(colRef);
+    const cleanedGoal = cleanUndefined(goal);
     const data = {
-      ...goal,
+      ...cleanedGoal,
       id: docRef.id,
       updatedAt: new Date().toISOString()
     };
@@ -226,8 +244,9 @@ export async function saveHabit(habit: Omit<Habit, 'id'> & { id?: string }) {
   try {
     const colRef = collection(db, 'habits');
     const docRef = habit.id ? doc(colRef, habit.id) : doc(colRef);
+    const cleanedHabit = cleanUndefined(habit);
     const data = {
-      ...habit,
+      ...cleanedHabit,
       id: docRef.id,
       updatedAt: new Date().toISOString()
     };
@@ -268,7 +287,8 @@ export async function saveDailyPlan(plan: DailyPlan) {
   const path = `dailyPlans/${plan.userId}_${plan.date}`;
   try {
     const docRef = doc(db, 'dailyPlans', `${plan.userId}_${plan.date}`);
-    await setDoc(docRef, plan, { merge: true });
+    const cleanedPlan = cleanUndefined(plan);
+    await setDoc(docRef, cleanedPlan, { merge: true });
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, path);
   }
@@ -300,14 +320,52 @@ export async function saveProductivityReport(report: Omit<ProductivityReport, 'i
   const path = 'productivityReports';
   try {
     const docRef = doc(collection(db, 'productivityReports'));
+    const cleanedReport = cleanUndefined(report);
     const data = {
-      ...report,
+      ...cleanedReport,
       id: docRef.id
     };
     await setDoc(docRef, data);
     return data as ProductivityReport;
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, path);
+  }
+}
+
+// ==========================================
+// GROUP CHAT OPERATIONS
+// ==========================================
+export function subscribeGroupMessages(groupId: string, channelId: string, callback: (msgs: any[]) => void) {
+  const path = `groups/${groupId}/channels/${channelId}/messages`;
+  try {
+    const q = query(
+      collection(db, 'groups', groupId, 'channels', channelId, 'messages'),
+      orderBy('timestamp', 'asc')
+    );
+    return onSnapshot(q, (snapshot) => {
+      const msgs: any[] = [];
+      snapshot.forEach((doc) => {
+        msgs.push({ id: doc.id, ...doc.data() });
+      });
+      callback(msgs);
+    }, (error) => {
+      console.error("Error subscribing to group messages:", error);
+    });
+  } catch (err) {
+    console.error(err);
+    return () => {};
+  }
+}
+
+export async function saveGroupMessage(groupId: string, channelId: string, message: any) {
+  const path = `groups/${groupId}/channels/${channelId}/messages`;
+  try {
+    const colRef = collection(db, 'groups', groupId, 'channels', channelId, 'messages');
+    const docRef = doc(colRef, message.id);
+    const cleanedMessage = cleanUndefined(message);
+    await setDoc(docRef, cleanedMessage, { merge: true });
+  } catch (error) {
+    console.error('Error saving group message:', error);
   }
 }
 
@@ -337,8 +395,9 @@ export async function createNotification(notif: Omit<AppNotification, 'id' | 'cr
   const path = 'notifications';
   try {
     const docRef = doc(collection(db, 'notifications'));
+    const cleanedNotif = cleanUndefined(notif);
     const data: AppNotification = {
-      ...notif,
+      ...cleanedNotif,
       id: docRef.id,
       read: false,
       createdAt: new Date().toISOString()
@@ -357,5 +416,58 @@ export async function markNotificationAsRead(notifId: string) {
     await updateDoc(docRef, { read: true });
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, path);
+  }
+}
+
+// ==========================================
+// STRATEGY PLANS OPERATIONS
+// ==========================================
+export function subscribeStrategyPlans(userId: string, callback: (plans: StrategyPlan[]) => void) {
+  const path = 'strategyPlans';
+  const q = query(
+    collection(db, 'strategyPlans'),
+    where('userId', '==', userId)
+  );
+  return onSnapshot(q, (snapshot) => {
+    const plans: StrategyPlan[] = [];
+    snapshot.forEach((doc) => {
+      plans.push({ id: doc.id, ...doc.data() } as StrategyPlan);
+    });
+    // Sort by updatedAt desc client-side to avoid index requirements
+    plans.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    callback(plans);
+  }, (error) => {
+    console.error("Error subscribing to strategy plans:", error);
+    handleFirestoreError(error, OperationType.LIST, path);
+  });
+}
+
+export async function saveStrategyPlan(plan: Omit<StrategyPlan, 'id'> & { id?: string }) {
+  const path = 'strategyPlans';
+  try {
+    const colRef = collection(db, 'strategyPlans');
+    const docRef = plan.id ? doc(colRef, plan.id) : doc(colRef);
+    const cleanedPlan = cleanUndefined(plan);
+    const data = {
+      nodes: [],
+      edges: [],
+      ...cleanedPlan,
+      id: docRef.id,
+      updatedAt: new Date().toISOString(),
+      createdAt: plan.createdAt || new Date().toISOString()
+    };
+    await setDoc(docRef, data, { merge: true });
+    return data;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, path);
+  }
+}
+
+export async function deleteStrategyPlan(planId: string) {
+  const path = `strategyPlans/${planId}`;
+  try {
+    await deleteDoc(doc(db, 'strategyPlans', planId));
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, path);
   }
 }

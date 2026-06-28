@@ -38,6 +38,8 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { GoogleSyncHub } from './GoogleSyncHub';
+import { RealtimeCall } from './RealtimeCall';
+import { subscribeGroupMessages, saveGroupMessage } from '../lib/db';
 
 // Types for the Workspace module
 interface Member {
@@ -226,6 +228,7 @@ export const Workspace: React.FC = () => {
   const [newGroupDesc, setNewGroupDesc] = useState('');
   const [newGroupCategory, setNewGroupCategory] = useState<Group['category']>('Project Team');
   const [showCreateGroup, setShowCreateGroup] = useState(false);
+  const [inviteEmails, setInviteEmails] = useState<string[]>(['']);
 
   const [inviteName, setInviteName] = useState('');
   const [inviteRole, setInviteRole] = useState<'Owner' | 'Admin' | 'Member' | 'Viewer'>('Member');
@@ -235,23 +238,44 @@ export const Workspace: React.FC = () => {
     e.preventDefault();
     if (!newGroupName.trim()) return;
 
+    const validEmails = inviteEmails.filter(email => email.trim() !== '');
+
+    const newMembers: Member[] = [
+      {
+        id: 'm_owner',
+        name: user?.name || 'Sarah',
+        role: 'Owner',
+        avatarUrl: user?.photoUrl || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
+        skills: ['Agile Project Management', 'Fullstack Development'],
+        workload: 20,
+        availability: 'Full Availability'
+      }
+    ];
+
+    validEmails.forEach((email, index) => {
+      newMembers.push({
+        id: `m_invite_${Date.now()}_${index}`,
+        name: email.split('@')[0] || 'Invited User',
+        role: 'Member',
+        avatarUrl: `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random() * 100000)}?w=100&h=100&fit=crop`,
+        skills: [],
+        workload: 0,
+        availability: 'Pending Invite',
+        email: email
+      });
+      
+      const subject = encodeURIComponent(`Invitation to join workspace: ${newGroupName}`);
+      const body = encodeURIComponent(`Hi there,\n\nYou have been invited to join the "${newGroupName}" workspace.\n\nPlease log in to access your new team dashboard.\n\nBest,\n${user?.name || 'Your Team'}`);
+      window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+    });
+
     const newG: Group = {
       id: 'g_' + Date.now(),
       name: newGroupName,
       description: newGroupDesc,
       category: newGroupCategory,
       owner: user?.name || 'Sarah',
-      members: [
-        {
-          id: 'm_owner',
-          name: user?.name || 'Sarah',
-          role: 'Owner',
-          avatarUrl: user?.photoUrl || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
-          skills: ['Agile Project Management', 'Fullstack Development'],
-          workload: 20,
-          availability: 'Full Availability'
-        }
-      ],
+      members: newMembers,
       createdAt: new Date().toISOString().split('T')[0]
     };
 
@@ -259,7 +283,12 @@ export const Workspace: React.FC = () => {
     setSelectedGroupId(newG.id);
     setNewGroupName('');
     setNewGroupDesc('');
+    setInviteEmails(['']);
     setShowCreateGroup(false);
+
+    if (validEmails.length > 0) {
+      alert(`Workspace created and invitations sent to ${validEmails.length} member(s)!`);
+    }
 
     // Create a default general channel
     const defChan: Channel = {
@@ -270,6 +299,24 @@ export const Workspace: React.FC = () => {
     };
     setChannels(prev => [...prev, defChan]);
     setSelectedChannelId(defChan.id);
+  };
+
+  const handleAddEmail = () => {
+    if (inviteEmails.length < 5) {
+      setInviteEmails([...inviteEmails, '']);
+    } else {
+      alert('Free tier allows inviting up to 5 members during workspace creation.');
+    }
+  };
+
+  const handleRemoveEmail = (index: number) => {
+    setInviteEmails(inviteEmails.filter((_, i) => i !== index));
+  };
+
+  const handleEmailChange = (index: number, value: string) => {
+    const newEmails = [...inviteEmails];
+    newEmails[index] = value;
+    setInviteEmails(newEmails);
   };
 
   const handleInviteMember = (e: React.FormEvent) => {
@@ -468,6 +515,32 @@ export const Workspace: React.FC = () => {
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!activeGroup?.id || !activeChannel?.id) return;
+    const unsub = subscribeGroupMessages(activeGroup.id, activeChannel.id, (msgs) => {
+      if (msgs && msgs.length > 0) {
+        setMessages(prev => {
+          const newMsgs = [...prev];
+          let changed = false;
+          msgs.forEach(m => {
+            const exists = newMsgs.find(old => old.id === m.id);
+            if (!exists) {
+              newMsgs.push(m);
+              changed = true;
+            }
+          });
+          if (!changed) return prev;
+          return newMsgs.sort((a,b) => {
+            const timeA = a.id.split('_').pop() || '0';
+            const timeB = b.id.split('_').pop() || '0';
+            return parseInt(timeA) - parseInt(timeB);
+          });
+        });
+      }
+    });
+    return () => unsub();
+  }, [activeGroup?.id, activeChannel?.id]);
+
+  useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
@@ -487,6 +560,7 @@ export const Workspace: React.FC = () => {
     };
 
     setMessages(prev => [...prev, userMsg]);
+    saveGroupMessage(activeGroup.id, selectedChannelId, userMsg);
     setTypedMessage('');
 
     // If tagged AI (contains @AI)
@@ -526,35 +600,13 @@ export const Workspace: React.FC = () => {
             timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
           };
           setMessages(prev => [...prev, aiMsg]);
+          saveGroupMessage(activeGroup.id, selectedChannelId, aiMsg);
         }
       } catch (err) {
         console.error('Error fetching AI response:', err);
       } finally {
         setIsTyping(false);
       }
-    } else {
-      // Simulate teammate micro reply after 3 seconds for high feel of real-time collaboration
-      setTimeout(() => {
-        const replies = [
-          "Got it, looking into this right now!",
-          "Agreed, that sounds like a solid plan.",
-          "I will push my updates in an hour. Keep pushing!",
-          "Perfect. Let's make sure David can review this before end of day."
-        ];
-        const teammate = activeGroup.members.find(m => m.name !== (user?.name || 'Sarah')) || activeGroup.members[1];
-        if (teammate) {
-          const autoMsg: ChatMessage = {
-            id: 'auto_msg_' + Date.now(),
-            channelId: selectedChannelId,
-            senderName: teammate.name,
-            senderAvatar: teammate.avatarUrl,
-            isAI: false,
-            content: replies[Math.floor(Math.random() * replies.length)],
-            timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-          };
-          setMessages(prev => [...prev, autoMsg]);
-        }
-      }, 3500);
     }
   };
 
@@ -879,7 +931,45 @@ Sarah: Perfect. John, assign David to the calendar test task. Let’s target our
               />
             </div>
 
-            <div className="flex justify-end gap-2 text-xs">
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between">
+                <label className="text-[10px] text-gray-400 uppercase tracking-wider">Invite Members (Up to 5 on Free Tier)</label>
+                {inviteEmails.length < 5 && (
+                  <button 
+                    type="button" 
+                    onClick={handleAddEmail}
+                    className="text-[10px] text-red-400 hover:text-red-300 font-semibold uppercase flex items-center gap-1"
+                  >
+                    <Plus className="w-3 h-3" /> Add Email
+                  </button>
+                )}
+              </div>
+              <div className="space-y-2">
+                {inviteEmails.map((email, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <input
+                      type="email"
+                      placeholder="teammate@example.com"
+                      value={email}
+                      onChange={(e) => handleEmailChange(index, e.target.value)}
+                      className="flex-1 bg-[#121318] text-xs text-white rounded-xl border border-white/5 p-2.5 outline-none focus:border-red-500/50 transition"
+                    />
+                    {inviteEmails.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveEmail(index)}
+                        className="p-2.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition"
+                      >
+                        <UserCheck className="w-4 h-4 opacity-0 hidden" />
+                        <span className="text-xs font-bold">X</span>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 text-xs pt-4">
               <button
                 type="button"
                 onClick={() => setShowCreateGroup(false)}
@@ -905,7 +995,7 @@ Sarah: Perfect. John, assign David to the calendar test task. Let’s target our
           { id: 'groups', label: 'Group Members', icon: Users },
           { id: 'sprint', label: 'Sprint Board', icon: Kanban },
           { id: 'goals', label: 'Team Milestones', icon: Target },
-          { id: 'chat', label: 'Simulated Team Chat', icon: MessageSquare },
+          { id: 'chat', label: 'Team Chat', icon: MessageSquare },
           { id: 'calls', label: 'Voice & Video Calling', icon: Video },
           { id: 'coach', label: 'AI Risk Coach', icon: Cpu },
           { id: 'google-sync', label: 'Google Workspace Sync', icon: Sparkles },
@@ -1665,112 +1755,17 @@ Sarah: Perfect. John, assign David to the calendar test task. Let’s target our
                     </div>
                     <div className="flex gap-2 text-xs font-semibold">
                       <button
-                        onClick={() => startCall('voice')}
-                        className="px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 flex items-center gap-1.5 transition"
-                      >
-                        <PhoneCall className="w-4 h-4 text-emerald-400" />
-                        Voice Only Call
-                      </button>
-                      <button
                         onClick={() => startCall('video')}
                         className="px-4 py-2.5 rounded-xl bg-red-500 text-black hover:bg-red-400 flex items-center gap-1.5 transition"
                       >
                         <Video className="w-4 h-4" />
-                        HD Group Video Call
+                        Join Realtime Video/Voice Call
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    {/* Interactive Video Stream Grid */}
-                    {callType === 'video' ? (
-                      <div className="grid grid-cols-2 gap-3 h-[280px]">
-                        {/* Member 1: Sarah */}
-                        <div className="rounded-xl bg-slate-900 border border-white/10 relative overflow-hidden flex items-center justify-center">
-                          {videoMuted ? (
-                            <div className="text-center space-y-1">
-                              <VideoOff className="w-8 h-8 mx-auto text-slate-500" />
-                              <p className="text-[10px] text-slate-400">Your Video Muted</p>
-                            </div>
-                          ) : (
-                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=200&fit=crop" className="w-full h-full object-cover" alt="Sarah" />
-                          )}
-                          <div className="absolute bottom-2 left-2 bg-black/60 px-2 py-0.5 rounded text-[9px] font-mono text-white">Sarah (Lead - You)</div>
-                          <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        </div>
-
-                        {/* Member 2: John */}
-                        <div className="rounded-xl bg-slate-900 border border-white/10 relative overflow-hidden flex items-center justify-center">
-                          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=200&fit=crop" className="w-full h-full object-cover" alt="John" />
-                          <div className="absolute bottom-2 left-2 bg-black/60 px-2 py-0.5 rounded text-[9px] font-mono text-white">John (Frontend)</div>
-                          <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="h-[240px] rounded-xl bg-white/[0.01] border border-white/5 flex items-center justify-center">
-                        <div className="text-center space-y-3">
-                          <div className="flex justify-center gap-4">
-                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" className="w-12 h-12 rounded-full object-cover border border-white/10" alt="Sarah" />
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" className="w-12 h-12 rounded-full object-cover border border-white/10" alt="John" />
-                          </div>
-                          <p className="text-xs text-white font-medium">Voice Call Active: Sarah, John (2 participants)</p>
-                          <div className="flex justify-center gap-1">
-                            {[1, 2, 3, 4, 5].map(i => (
-                              <span key={i} className="w-1 bg-red-500 rounded animate-pulse" style={{ height: `${8 + Math.random() * 20}px`, animationDelay: `${i*100}ms` }} />
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Controls panel */}
-                    <div className="flex justify-between items-center p-3 bg-white/[0.02] border border-white/5 rounded-xl text-xs">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setMicMuted(!micMuted)}
-                          className={`p-2.5 rounded-lg transition ${micMuted ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-white/5 text-slate-300'}`}
-                          title={micMuted ? 'Unmute Mic' : 'Mute Mic'}
-                        >
-                          {micMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                        </button>
-
-                        {callType === 'video' && (
-                          <button
-                            onClick={() => setVideoMuted(!videoMuted)}
-                            className={`p-2.5 rounded-lg transition ${videoMuted ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-white/5 text-slate-300'}`}
-                            title={videoMuted ? 'Start Camera' : 'Stop Camera'}
-                          >
-                            {videoMuted ? <VideoOff className="w-4 h-4" /> : <Video className="w-4 h-4" />}
-                          </button>
-                        )}
-
-                        <button
-                          onClick={() => setIsScreenSharing(!isScreenSharing)}
-                          className={`p-2.5 rounded-lg transition ${isScreenSharing ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-white/5 text-slate-300'}`}
-                          title="Screen Share"
-                        >
-                          <ScreenShare className="w-4 h-4" />
-                        </button>
-
-                        <button
-                          onClick={() => setIsRecording(!isRecording)}
-                          className={`p-2.5 rounded-lg transition ${isRecording ? 'bg-red-500/20 text-red-500 animate-pulse border border-red-500/30' : 'bg-white/5 text-slate-300'}`}
-                          title="Record Call"
-                        >
-                          <div className="w-3.5 h-3.5 bg-red-500 rounded-full shrink-0" />
-                        </button>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <span className="text-[10px] font-mono text-slate-500 uppercase">Dur: 04:12</span>
-                        <button
-                          onClick={endCall}
-                          className="px-3.5 py-1.5 bg-red-500 hover:bg-red-400 text-black font-semibold rounded-lg text-[10px]"
-                        >
-                          Disconnect Call
-                        </button>
-                      </div>
-                    </div>
+                  <div className="h-[400px]">
+                    <RealtimeCall roomId={activeGroup.id} onLeave={() => setCallActive(false)} />
                   </div>
                 )}
               </div>

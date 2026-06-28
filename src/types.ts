@@ -135,6 +135,16 @@ export interface ProductivityReport {
   generatedAt: string;
 }
 
+export interface StrategyPlan {
+  id: string;
+  userId: string;
+  name: string;
+  nodes: any[];
+  edges: any[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AppNotification {
   id: string;
   userId: string;

@@ -25,13 +25,13 @@ export const Habits: React.FC = () => {
       {/* Title */}
       <div className="flex justify-between items-center">
         <div className="space-y-1">
-          <h2 className="font-display text-2xl font-bold text-white tracking-tight">Smart Habits</h2>
-          <p className="text-gray-400 text-xs sm:text-sm">Build routines that protect your focus slots. Tracking daily habits reinforces productivity scores.</p>
+          <h2 className="font-display text-2xl font-bold text-primary-text tracking-tight">Smart Habits</h2>
+          <p className="text-secondary-text text-xs sm:text-sm">Build routines that protect your focus slots. Tracking daily habits reinforces productivity scores.</p>
         </div>
         <button 
           id="toggle-habit-form"
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400 hover:bg-orange-500/15 font-semibold text-xs transition flex items-center space-x-1.5"
+          className="px-4 py-2 rounded-xl bg-accent/10 border border-accent/20 text-accent hover:opacity-80 font-semibold text-xs transition flex items-center space-x-1.5"
         >
           <Plus className="w-4 h-4" />
           <span>New Habit</span>
@@ -39,7 +39,7 @@ export const Habits: React.FC = () => {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="glass-panel p-5.5 rounded-2xl border-white/5 flex gap-3 flex-col sm:flex-row max-w-xl items-center">
+        <form onSubmit={handleSubmit} className="glass-panel p-5.5 rounded-2xl border-border-main flex gap-3 flex-col sm:flex-row max-w-xl items-center">
           <div className="flex-1 flex gap-2 w-full">
             <input 
               id="habit-title-input"
@@ -47,14 +47,14 @@ export const Habits: React.FC = () => {
               value={title} 
               onChange={(e) => setTitle(e.target.value)} 
               placeholder="e.g. Code for 1 hour, read tech articles..." 
-              className="flex-1 bg-[#0a0d16] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-gray-200 focus:outline-none focus:border-orange-500/50"
+              className="flex-1 bg-surface border border-border-main rounded-xl px-4 py-2.5 text-xs text-primary-text focus:outline-none focus:border-accent/50"
             />
             <AiPolishButton text={title} onPolish={setTitle} className="px-3" />
           </div>
           <button 
             id="submit-habit-btn"
             type="submit" 
-            className="py-2.5 px-5 rounded-xl bg-orange-500 text-white text-xs font-semibold hover:opacity-95 transition whitespace-nowrap"
+            className="py-2.5 px-5 rounded-xl bg-accent text-black text-xs font-semibold hover:opacity-95 transition whitespace-nowrap"
           >
             Track Habit
           </button>
@@ -70,7 +70,7 @@ export const Habits: React.FC = () => {
           return (
             <div 
               key={habit.id} 
-              className="glass-panel p-5.5 rounded-2xl border-white/5 space-y-4 relative overflow-hidden group hover:border-white/10 transition"
+              className="glass-panel p-5.5 rounded-2xl border-border-main space-y-4 relative overflow-hidden group hover:border-white/10 transition"
             >
               <div className="flex justify-between items-start gap-4">
                 <div className="flex items-center space-x-3.5">
@@ -79,25 +79,25 @@ export const Habits: React.FC = () => {
                     onClick={() => toggleHabitCompletion(habit.id, todayStr)}
                     className={`w-10 h-10 rounded-xl border flex items-center justify-center transition ${
                       isDoneToday 
-                        ? 'bg-orange-500 border-orange-500 text-white shadow-lg shadow-orange-500/20' 
-                        : 'border-white/10 text-gray-400 hover:border-orange-500/50'
+                        ? 'bg-accent border-accent text-black shadow-lg shadow-accent/20' 
+                        : 'border-border-main text-secondary-text hover:border-accent/50'
                     }`}
                   >
                     <Check className={`w-5 h-5 ${isDoneToday ? 'stroke-[3]' : ''}`} />
                   </button>
 
                   <div className="space-y-0.5">
-                    <h4 className="font-display font-semibold text-white text-sm sm:text-base leading-snug">
+                    <h4 className="font-display font-semibold text-primary-text text-sm sm:text-base leading-snug">
                       {habit.title}
                     </h4>
-                    <div className="flex items-center space-x-2 text-[10px] text-gray-500 font-mono font-bold uppercase tracking-wider">
+                    <div className="flex items-center space-x-2 text-[10px] text-secondary-text font-mono font-bold uppercase tracking-wider">
                       <span>Consistency: {habit.consistencyScore}%</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-3">
-                  <div className="flex items-center space-x-1 font-mono text-orange-400 font-bold text-sm">
+                  <div className="flex items-center space-x-1 font-mono text-accent font-bold text-sm">
                     <Flame className="w-4.5 h-4.5 text-orange-500 fill-orange-500/10 animate-pulse" />
                     <span>{habit.streak}d</span>
                   </div>

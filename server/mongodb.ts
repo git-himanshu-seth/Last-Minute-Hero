@@ -61,6 +61,7 @@ export interface MongoStatus {
     tasks: number;
     goals: number;
     habits: number;
+    plans: number;
   };
 }
 
@@ -142,7 +143,7 @@ export async function checkMongoStatus(): Promise<MongoStatus> {
     const { db } = await getMongoDB();
     
     // Fetch count from collections
-    const collections = ['users', 'tasks', 'goals', 'habits'];
+    const collections = ['users', 'tasks', 'goals', 'habits', 'plans'];
     const counts: Record<string, number> = {};
     
     for (const colName of collections) {
@@ -164,6 +165,7 @@ export async function checkMongoStatus(): Promise<MongoStatus> {
         tasks: counts.tasks || 0,
         goals: counts.goals || 0,
         habits: counts.habits || 0,
+        plans: counts.plans || 0,
       }
     };
   } catch (err: any) {
@@ -265,6 +267,24 @@ export async function deleteFromMongo(collectionName: string, id: string) {
 }
 
 /**
+ * Synchronizes user plans (diagrams) to MongoDB.
+ */
+export async function syncPlanToMongo(userId: string, plan: any) {
+  try {
+    const { db } = await getMongoDB();
+    await db.collection('plans').updateOne(
+      { id: plan.id },
+      { $set: { ...plan, userId, updatedAt: new Date().toISOString() } },
+      { upsert: true }
+    );
+    return { success: true };
+  } catch (err: any) {
+    console.log('MongoDB sync status: skipped plan update.');
+    return { success: false, error: err.message };
+  }
+}
+
+/**
  * Retrieves all data of a specific user from MongoDB (for data recovery/loading).
  */
 export async function fetchAllUserDataFromMongo(userId: string) {
@@ -274,13 +294,15 @@ export async function fetchAllUserDataFromMongo(userId: string) {
     const tasks = await db.collection('tasks').find({ userId }).toArray();
     const goals = await db.collection('goals').find({ userId }).toArray();
     const habits = await db.collection('habits').find({ userId }).toArray();
+    const plans = await db.collection('plans').find({ userId }).toArray();
 
     return {
       success: true,
       profile,
       tasks: tasks.map(t => ({ ...t, _id: undefined })),
       goals: goals.map(g => ({ ...g, _id: undefined })),
-      habits: habits.map(h => ({ ...h, _id: undefined }))
+      habits: habits.map(h => ({ ...h, _id: undefined })),
+      plans: plans.map(p => ({ ...p, _id: undefined }))
     };
   } catch (err: any) {
     console.log('MongoDB sync status: skipped fetching all user data.');

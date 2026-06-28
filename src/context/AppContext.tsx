@@ -28,7 +28,10 @@ import {
   getLatestProductivityReport, 
   saveProductivityReport, 
   createNotification, 
-  markNotificationAsRead 
+  markNotificationAsRead,
+  subscribeStrategyPlans,
+  saveStrategyPlan,
+  deleteStrategyPlan
 } from '../lib/db';
 import { 
   mockTasks, 
@@ -36,9 +39,10 @@ import {
   mockHabits, 
   mockDailyPlans, 
   mockReport, 
-  mockNotifications 
+  mockNotifications,
+  mockStrategyPlans 
 } from '../lib/mockData';
-import { Task, Goal, Habit, DailyPlan, ProductivityReport, AppNotification, UserProfile } from '../types';
+import { Task, Goal, Habit, DailyPlan, ProductivityReport, AppNotification, UserProfile, StrategyPlan } from '../types';
 
 export interface ToastMessage {
   id: string;
@@ -54,6 +58,7 @@ interface AppContextProps {
   dailyPlan: DailyPlan | null;
   report: ProductivityReport | null;
   notifications: AppNotification[];
+  strategyPlans: StrategyPlan[];
   loading: boolean;
   isDemo: boolean;
   activeTab: string;
@@ -114,6 +119,11 @@ interface AppContextProps {
   
   // Read notification
   readNotification: (id: string) => Promise<void>;
+  
+  // Strategy Plans
+  addStrategyPlan: (name: string, nodes: any[], edges: any[]) => Promise<StrategyPlan>;
+  updateStrategyPlan: (plan: StrategyPlan) => Promise<void>;
+  removeStrategyPlan: (planId: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextProps | undefined>(undefined);
@@ -127,6 +137,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [dailyPlan, setDailyPlan] = useState<DailyPlan | null>(null);
   const [report, setReport] = useState<ProductivityReport | null>(null);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [strategyPlans, setStrategyPlans] = useState<StrategyPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDemo, setIsDemo] = useState(false);
   const [activeTab, setActiveTab] = useState('landing');
@@ -247,6 +258,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setDailyPlan(mockDailyPlans[0]);
     setReport(mockReport);
     setNotifications(mockNotifications);
+    setStrategyPlans(mockStrategyPlans || []);
     setActiveTab('dashboard');
     setLoading(false);
   };
@@ -292,7 +304,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setActiveTab('dashboard');
       }
     } catch (err) {
-      console.error("Google Auth Error:", err);
+      if (err instanceof Error && 'code' in err && (err as any).code === 'auth/cancelled-popup-request') {
+        showToast('Authentication cancelled. Please try again.', 'info');
+      } else {
+        console.error("Google Auth Error:", err);
+        showToast('Failed to sign in. Please try again.', 'error');
+      }
     } finally {
       setLoading(false);
     }
@@ -398,6 +415,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setNotifications(loadedNotifs);
     });
 
+    const unSubPlans = subscribeStrategyPlans(user.id, (loadedPlans) => {
+      setStrategyPlans(loadedPlans);
+    });
+
     // Fetch daily plan
     const todayStr = new Date().toISOString().split('T')[0];
     getDailyPlan(user.id, todayStr).then((plan) => {
@@ -414,6 +435,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       unSubGoals();
       unSubHabits();
       unSubNotifications();
+      unSubPlans();
     };
   }, [user, isDemo]);
 
@@ -813,6 +835,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if ((task.priority === 'critical' || task.riskLevel === 'critical' || task.priority === 'high') && !updatedBadges.includes('rescue-survivor')) {
         updatedBadges.push('rescue-survivor');
       }
+
+      if (!updatedBadges.includes('task-finisher')) {
+        updatedBadges.push('task-finisher');
+      }
       
       const updatedUserProfile = { 
         ...user, 
@@ -829,6 +855,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // Add corresponding achievement notification alerts
       if (isOnTime && !user.badges?.includes('speed-runner')) {
         const notifMsg = `🏆 ACHIEVEMENT UNLOCKED: You earned the 'Speed Runner' Badge for completing '${task.title}' before the clock ran out!`;
+        const newNotif: AppNotification = {
+          id: `notif-${Date.now()}`,
+          userId: user.id,
+          message: notifMsg,
+          type: 'info',
+          read: false,
+          createdAt: new Date().toISOString()
+        };
+        setNotifications(prev => [newNotif, ...prev]);
+      }
+      
+      if (!user.badges?.includes('task-finisher')) {
+        const notifMsg = `🏆 ACHIEVEMENT UNLOCKED: You earned the 'Task Finisher' Badge for completing '${task.title}'!`;
         const newNotif: AppNotification = {
           id: `notif-${Date.now()}`,
           userId: user.id,
@@ -1179,6 +1218,87 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  // ==========================================
+  // STRATEGY PLANS ACTIONS
+  // ==========================================
+  const addStrategyPlan = async (name: string, nodes: any[], edges: any[]): Promise<StrategyPlan> => {
+    if (!user) throw new Error("Must be logged in to save plans");
+    
+    const newPlan: Omit<StrategyPlan, 'id'> = {
+      userId: user.id,
+      name,
+      nodes,
+      edges,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    let saved: StrategyPlan;
+    if (isDemo) {
+      saved = { ...newPlan, id: `plan-${Date.now()}` } as StrategyPlan;
+      setStrategyPlans((prev) => [saved, ...prev]);
+    } else {
+      saved = await saveStrategyPlan(newPlan) as StrategyPlan;
+      
+      // Also sync to MongoDB if available
+      try {
+        await fetch('/api/mongodb/sync/plan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user.id, plan: saved })
+        });
+      } catch (err) {
+        console.log('MongoDB sync skipped for plan');
+      }
+    }
+    
+    showToast(`Strategy plan '${name}' saved successfully!`, 'success');
+    return saved;
+  };
+
+  const updateStrategyPlan = async (plan: StrategyPlan) => {
+    if (!user) return;
+    const updatedPlan = { ...plan, updatedAt: new Date().toISOString() };
+    
+    if (isDemo) {
+      setStrategyPlans((prev) => prev.map((p) => p.id === plan.id ? updatedPlan : p));
+    } else {
+      await saveStrategyPlan(updatedPlan);
+      
+      // Sync to MongoDB
+      try {
+        await fetch('/api/mongodb/sync/plan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user.id, plan: updatedPlan })
+        });
+      } catch (err) {
+        console.log('MongoDB sync skipped');
+      }
+    }
+    showToast(`Plan '${plan.name}' updated.`, 'success');
+  };
+
+  const removeStrategyPlan = async (planId: string) => {
+    if (isDemo) {
+      setStrategyPlans((prev) => prev.filter((p) => p.id !== planId));
+    } else {
+      await deleteStrategyPlan(planId);
+      
+      // Delete from MongoDB
+      try {
+        await fetch('/api/mongodb/delete', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ collectionName: 'plans', id: planId })
+        });
+      } catch (err) {
+        console.log('MongoDB deletion skipped');
+      }
+    }
+    showToast('Plan removed.', 'info');
+  };
+
   return (
     <AppContext.Provider value={{
       user,
@@ -1188,6 +1308,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       dailyPlan,
       report,
       notifications,
+      strategyPlans,
       loading,
       isDemo,
       activeTab,
@@ -1239,7 +1360,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       
       generateTodayPlan,
       generateProductivityReport,
-      readNotification
+      readNotification,
+      
+      // Strategy Plans
+      addStrategyPlan,
+      updateStrategyPlan,
+      removeStrategyPlan
     }}>
       {children}
     </AppContext.Provider>

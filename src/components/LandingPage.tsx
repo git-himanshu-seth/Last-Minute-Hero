@@ -116,27 +116,27 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartDemo, onLogin, 
     }
   };
   return (
-    <div className="relative min-h-screen bg-[#050505] text-gray-100 overflow-hidden font-sans">
+    <div className="relative min-h-screen bg-primary-bg text-primary-text overflow-hidden font-sans">
       {/* Background ambient glowing circles */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-red-950/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-15%] right-[-10%] w-[60%] h-[60%] rounded-full bg-slate-900/15 blur-[150px] pointer-events-none" />
-      <div className="absolute top-[30%] left-[40%] w-[350px] h-[350px] rounded-full bg-red-900/5 blur-[100px] pointer-events-none" />
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-accent/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-15%] right-[-10%] w-[60%] h-[60%] rounded-full bg-accent/5 blur-[150px] pointer-events-none" />
+      <div className="absolute top-[30%] left-[40%] w-[350px] h-[350px] rounded-full bg-accent/5 blur-[100px] pointer-events-none" />
 
       {/* Navigation header */}
       <header className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center relative z-10">
         <div className="flex items-center space-x-2.5">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-500 via-orange-500 to-amber-500 flex items-center justify-center shadow-lg shadow-red-500/20">
-            <Clock className="w-5.5 h-5.5 text-white stroke-[2.5]" />
+          <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shadow-lg shadow-accent/20">
+            <Clock className="w-5.5 h-5.5 text-black stroke-[2.5]" />
           </div>
-          <span className="font-display font-bold text-lg tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-            Last Minute Life Saver
+          <span className="font-display font-bold text-lg tracking-tight text-primary-text">
+            Life Saver AI
           </span>
         </div>
         <div className="flex items-center space-x-4">
           <button 
             id="demo-nav-btn"
             onClick={onStartDemo}
-            className="text-xs px-4 py-2 rounded-lg text-gray-400 hover:text-white transition duration-200"
+            className="text-xs px-4 py-2 rounded-lg text-secondary-text hover:text-primary-text transition duration-200"
           >
             Try Demo Mode
           </button>
@@ -148,7 +148,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartDemo, onLogin, 
               setShowAuthForm(true);
             }}
             disabled={loading}
-            className="text-xs px-4 py-2.5 rounded-lg bg-gray-800 hover:bg-gray-700 font-medium text-white border border-gray-700/60 transition duration-200"
+            className="text-xs px-4 py-2.5 rounded-lg bg-surface hover:bg-white/[0.05] font-medium text-primary-text border border-border-main transition duration-200"
           >
             Log In
           </button>
@@ -171,10 +171,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartDemo, onLogin, 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="font-display text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6 leading-[1.1]"
+          className="font-display text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-primary-text mb-6 leading-[1.1]"
         >
           AI that doesn't just remind you — <br />
-          <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-300 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-accent via-accent/80 to-accent/60 bg-clip-text text-transparent">
             it helps you finish.
           </span>
         </motion.h1>
@@ -183,9 +183,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartDemo, onLogin, 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="max-w-2xl mx-auto text-gray-400 text-sm sm:text-base mb-10 leading-relaxed font-sans"
+          className="max-w-2xl mx-auto text-secondary-text text-sm sm:text-base mb-10 leading-relaxed font-sans"
         >
-          Stop ignoring passive reminders. Last Minute Life Saver predicts deadline risk, isolates procrastination root causes, and automatically generates hour-by-hour Emergency Rescue Plans.
+          Stop ignoring passive reminders. Life Saver AI predicts deadline risk, isolates procrastination root causes, and automatically generates hour-by-hour Emergency Rescue Plans.
         </motion.p>
 
         <motion.div 
@@ -197,7 +197,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartDemo, onLogin, 
           <button 
             id="start-demo-hero-btn"
             onClick={onStartDemo}
-            className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-red-500 via-orange-500 to-amber-500 text-white font-medium shadow-xl shadow-red-500/20 hover:opacity-95 hover:shadow-red-500/30 transition duration-200 flex items-center justify-center space-x-2 text-sm"
+            className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-accent text-black font-bold shadow-xl shadow-accent/20 hover:opacity-95 transition duration-200 flex items-center justify-center space-x-2 text-sm"
           >
             <span>Activate Demo Mode</span>
             <ArrowRight className="w-4 h-4" />

@@ -34,13 +34,13 @@ export const Goals: React.FC = () => {
       {/* Title */}
       <div className="flex justify-between items-center">
         <div className="space-y-1">
-          <h2 className="font-display text-2xl font-bold text-white tracking-tight">Milestone Goals</h2>
-          <p className="text-gray-400 text-xs sm:text-sm">Establish long-term goals. Your AI coach correlates daily tasks to these milestones.</p>
+          <h2 className="font-display text-2xl font-bold text-primary-text tracking-tight">Milestone Goals</h2>
+          <p className="text-secondary-text text-xs sm:text-sm">Establish long-term goals. Your AI coach correlates daily tasks to these milestones.</p>
         </div>
         <button 
           id="toggle-goal-form"
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400 hover:bg-orange-500/15 font-semibold text-xs transition flex items-center space-x-1.5"
+          className="px-4 py-2 rounded-xl bg-accent/10 border border-accent/20 text-accent hover:opacity-80 font-semibold text-xs transition flex items-center space-x-1.5"
         >
           <Plus className="w-4 h-4" />
           <span>Define Goal</span>
@@ -48,9 +48,9 @@ export const Goals: React.FC = () => {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="glass-panel p-5.5 rounded-2xl border-white/5 grid grid-cols-1 sm:grid-cols-3 gap-4.5">
+        <form onSubmit={handleSubmit} className="glass-panel p-5.5 rounded-2xl border-border-main grid grid-cols-1 sm:grid-cols-3 gap-4.5">
           <div className="sm:col-span-3 space-y-1">
-            <label className="text-xs text-gray-400 font-medium">Goal Name</label>
+            <label className="text-xs text-secondary-text font-medium">Goal Name</label>
             <div className="flex gap-2">
               <input 
                 id="goal-title-input"
@@ -58,19 +58,19 @@ export const Goals: React.FC = () => {
                 value={title} 
                 onChange={(e) => setTitle(e.target.value)} 
                 placeholder="e.g. Land a Google Summer of Code internship" 
-                className="flex-1 bg-[#0a0d16] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-gray-200 focus:outline-none focus:border-orange-500/50"
+                className="flex-1 bg-surface border border-border-main rounded-xl px-4 py-2.5 text-xs text-primary-text focus:outline-none focus:border-accent/50"
               />
               <AiPolishButton text={title} onPolish={setTitle} className="px-3" />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs text-gray-400 font-medium">Type</label>
+            <label className="text-xs text-secondary-text font-medium">Type</label>
             <select 
               id="goal-type-select"
               value={type} 
               onChange={(e) => setType(e.target.value as any)} 
-              className="w-full bg-[#0a0d16] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-gray-200 focus:outline-none focus:border-orange-500/50"
+              className="w-full bg-surface border border-border-main rounded-xl px-4 py-2.5 text-xs text-primary-text focus:outline-none focus:border-accent/50"
             >
               <option value="career">Career Development</option>
               <option value="academic">Academic Excellence</option>
@@ -81,13 +81,13 @@ export const Goals: React.FC = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs text-gray-400 font-medium">Target Date</label>
+            <label className="text-xs text-secondary-text font-medium">Target Date</label>
             <input 
               id="goal-target-date"
               type="date" 
               value={targetDate} 
               onChange={(e) => setTargetDate(e.target.value)} 
-              className="w-full bg-[#0a0d16] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-gray-200 focus:outline-none"
+              className="w-full bg-surface border border-border-main rounded-xl px-4 py-2.5 text-xs text-primary-text focus:outline-none"
             />
           </div>
 
@@ -95,7 +95,7 @@ export const Goals: React.FC = () => {
             <button 
               id="submit-goal-btn"
               type="submit" 
-              className="w-full py-2.5 rounded-xl bg-orange-500 text-white text-xs font-semibold hover:opacity-95 transition"
+              className="w-full py-2.5 rounded-xl bg-accent text-black text-xs font-semibold hover:opacity-95 transition"
             >
               Add Goal
             </button>

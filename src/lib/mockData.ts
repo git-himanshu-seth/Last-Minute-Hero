@@ -1,4 +1,4 @@
-import { Task, Goal, Habit, DailyPlan, ProductivityReport, AppNotification, Badge } from '../types';
+import { Task, Goal, Habit, DailyPlan, ProductivityReport, AppNotification, Badge, StrategyPlan } from '../types';
 
 export const ALL_MOCK_BADGES: Badge[] = [
   {
@@ -276,5 +276,22 @@ export const mockNotifications: AppNotification[] = [
     type: 'info',
     read: false,
     createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString()
+  }
+];
+
+export const mockStrategyPlans: StrategyPlan[] = [
+  {
+    id: 'plan-1',
+    userId: 'demo-user',
+    name: 'Q3 Development Strategy',
+    nodes: [
+      { id: 'n1', position: { x: 250, y: 0 }, type: 'task', data: { label: 'Initial Strategy', category: 'General', hours: 2 } },
+      { id: 'n2', position: { x: 250, y: 150 }, type: 'step', data: { label: 'Market Research' } }
+    ],
+    edges: [
+      { id: 'e1-2', source: 'n1', target: 'n2' }
+    ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 ];

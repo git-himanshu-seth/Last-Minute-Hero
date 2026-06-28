@@ -127,14 +127,14 @@ export const Tasks: React.FC = () => {
     <div className="space-y-6">
       {/* Title */}
       <div className="space-y-1">
-        <h2 className="font-display text-2xl font-bold text-white tracking-tight">AI Task Manager</h2>
-        <p className="text-gray-400 text-xs sm:text-sm">Capture tasks via natural language, screenshots, or voice. AI takes care of planning, breakdown, and rescue.</p>
+        <h2 className="font-display text-2xl font-bold text-primary-text tracking-tight">AI Task Manager</h2>
+        <p className="text-secondary-text text-xs sm:text-sm">Capture tasks via natural language, screenshots, or voice. AI takes care of planning, breakdown, and rescue.</p>
       </div>
 
       {/* Capture Input Panel */}
-      <div className="glass-panel p-5.5 rounded-2xl border-white/5 space-y-4">
-        <div className="flex items-center space-x-2 text-xs font-semibold text-gray-400 uppercase tracking-wider font-mono">
-          <Sparkles className="w-4 h-4 text-orange-400" />
+      <div className="glass-panel p-5.5 rounded-2xl border-border-main space-y-4">
+        <div className="flex items-center space-x-2 text-xs font-semibold text-secondary-text uppercase tracking-wider font-mono">
+          <Sparkles className="w-4 h-4 text-accent" />
           <span>Multimodal Capture Engine</span>
         </div>
 
@@ -146,7 +146,7 @@ export const Tasks: React.FC = () => {
               onChange={(e) => setText(e.target.value)}
               placeholder="e.g. Submit DBMS assignment next Friday before 5pm. Needs about 6 hours."
               rows={3}
-              className="w-full bg-[#0a0d16] border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-orange-500/50 resize-none transition"
+              className="w-full bg-surface border border-border-main rounded-xl px-4 py-3 text-sm text-primary-text placeholder-secondary-text focus:outline-none focus:border-accent/50 resize-none transition"
             />
             
             <div className="absolute bottom-3.5 right-3.5 flex items-center space-x-2">
@@ -162,7 +162,7 @@ export const Tasks: React.FC = () => {
                 type="button"
                 id="media-upload-btn"
                 onClick={() => fileInputRef.current?.click()}
-                className={`p-2 rounded-lg border hover:bg-white/[0.04] transition ${mediaFile ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/25' : 'text-gray-400 bg-[#0c101c] border-white/5'}`}
+                className={`p-2 rounded-lg border hover:bg-white/[0.04] transition ${mediaFile ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/25' : 'text-secondary-text bg-surface border-border-main'}`}
                 title="Attach Syllabus or Bill Screenshot"
               >
                 <Camera className="w-4 h-4" />
@@ -173,7 +173,7 @@ export const Tasks: React.FC = () => {
                 type="button"
                 id="voice-input-btn"
                 onClick={simulateVoiceInput}
-                className={`p-2 rounded-lg border hover:bg-white/[0.04] transition ${audioRecording ? 'text-red-400 bg-red-500/10 border-red-500/25 animate-pulse' : 'text-gray-400 bg-[#0c101c] border-white/5'}`}
+                className={`p-2 rounded-lg border hover:bg-white/[0.04] transition ${audioRecording ? 'text-red-400 bg-red-500/10 border-red-500/25 animate-pulse' : 'text-secondary-text bg-surface border-border-main'}`}
                 title="Record Voice Command"
               >
                 <Mic className="w-4 h-4" />
@@ -183,7 +183,7 @@ export const Tasks: React.FC = () => {
               <AiPolishButton 
                 text={text} 
                 onPolish={setText} 
-                className="p-2 border border-white/5 bg-[#0c101c] text-orange-400"
+                className="p-2 border border-border-main bg-surface text-accent"
                 tooltipText="Polish grammar before capturing"
               />
             </div>
@@ -195,7 +195,7 @@ export const Tasks: React.FC = () => {
               <button 
                 type="button" 
                 onClick={() => setMediaFile(null)} 
-                className="text-gray-400 hover:text-white font-bold"
+                className="text-secondary-text hover:text-primary-text font-bold"
               >
                 Remove
               </button>
@@ -214,7 +214,7 @@ export const Tasks: React.FC = () => {
               id="capture-task-submit"
               type="submit"
               disabled={loadingCapture || !text.trim()}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold text-xs shadow-lg shadow-red-500/10 hover:opacity-95 transition disabled:opacity-50"
+              className="px-5 py-2.5 rounded-xl bg-accent text-black font-bold text-xs shadow-lg shadow-accent/20 hover:opacity-95 transition disabled:opacity-50"
             >
               {loadingCapture ? "AI Analyzing details..." : "Capture with AI"}
             </button>
@@ -228,14 +228,14 @@ export const Tasks: React.FC = () => {
         {/* Left Column: Tasks List */}
         <div className="lg:col-span-2 space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-text" />
             <input
               id="task-search-input"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search tasks..."
-              className="w-full bg-[#0a0d16] border border-white/5 rounded-xl pl-9 pr-4 py-2.5 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-orange-500/30 transition"
+              className="w-full bg-secondary-bg border border-border-main rounded-xl pl-9 pr-4 py-2.5 text-xs text-primary-text placeholder-secondary-text focus:outline-none focus:border-accent/30 transition"
             />
           </div>
 
@@ -245,7 +245,7 @@ export const Tasks: React.FC = () => {
                 <div 
                   key={task.id}
                   onClick={() => setSelectedTask(task)}
-                  className={`p-4 rounded-xl border transition cursor-pointer ${selectedTask?.id === task.id ? 'bg-white/[0.04] border-orange-500/40 shadow-lg' : 'bg-white/[0.01] border-white/5 hover:border-white/10'}`}
+                  className={`p-4 rounded-xl border transition cursor-pointer ${selectedTask?.id === task.id ? 'bg-white/[0.04] border-accent/40 shadow-lg' : 'bg-white/[0.01] border-border-main hover:border-white/10'}`}
                 >
                   <div className="flex justify-between items-start gap-4">
                     <div className="flex items-start space-x-3">
@@ -260,14 +260,14 @@ export const Tasks: React.FC = () => {
                         {task.status === 'completed' && <CheckCircle className="w-3.5 h-3.5 text-white" />}
                       </button>
                       <div className="space-y-1">
-                        <h4 className={`font-display font-semibold text-sm sm:text-base ${task.status === 'completed' ? 'text-gray-500 line-through' : 'text-white'}`}>
+                        <h4 className={`font-display font-semibold text-sm sm:text-base ${task.status === 'completed' ? 'text-secondary-text line-through' : 'text-primary-text'}`}>
                           {task.title}
                         </h4>
                         <div className="flex flex-wrap items-center gap-2">
                           <span className={`text-[9px] font-mono px-2 py-0.5 rounded-md border uppercase font-bold ${getPriorityColor(task.priority)}`}>
                             {task.priority}
                           </span>
-                          <span className="text-[10px] text-gray-500 uppercase font-mono font-bold tracking-wider bg-white/[0.03] px-1.5 py-0.5 rounded border border-white/5">
+                          <span className="text-[10px] text-secondary-text uppercase font-mono font-bold tracking-wider bg-white/[0.03] px-1.5 py-0.5 rounded border border-border-main">
                             {task.category}
                           </span>
                         </div>
@@ -275,8 +275,8 @@ export const Tasks: React.FC = () => {
                     </div>
 
                     <div className="text-right text-xs">
-                      <div className="text-gray-400">Due:</div>
-                      <div className="font-mono text-white font-medium mt-0.5">
+                      <div className="text-secondary-text">Due:</div>
+                      <div className="font-mono text-primary-text font-medium mt-0.5">
                         {new Date(task.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </div>
                     </div>
@@ -284,7 +284,7 @@ export const Tasks: React.FC = () => {
                 </div>
               ))
             ) : (
-              <div className="py-12 text-center text-gray-500 text-xs">
+              <div className="py-12 text-center text-secondary-text text-xs">
                 No tasks match your search query. Try adding a new task!
               </div>
             )}
@@ -294,16 +294,16 @@ export const Tasks: React.FC = () => {
         {/* Right Column: Active Task Details and Rescue diagnostics */}
         <div>
           {selectedTask ? (
-            <div className="glass-panel p-5.5 rounded-2xl border-white/5 space-y-5">
+            <div className="glass-panel p-5.5 rounded-2xl border-border-main space-y-5">
               <div className="flex justify-between items-start">
-                <h3 className="font-display font-bold text-white text-base truncate pr-2">Task Diagnostics</h3>
+                <h3 className="font-display font-bold text-primary-text text-base truncate pr-2">Task Diagnostics</h3>
                 <button 
                   id={`delete-task-btn-${selectedTask.id}`}
                   onClick={() => {
                     removeTask(selectedTask.id);
                     setSelectedTask(null);
                   }}
-                  className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition"
+                  className="p-1.5 rounded-lg text-secondary-text hover:text-red-400 hover:bg-red-500/10 transition"
                   title="Delete Task"
                 >
                   <Trash2 className="w-4.5 h-4.5" />
@@ -311,21 +311,21 @@ export const Tasks: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <div className="font-display font-bold text-white text-sm sm:text-base leading-snug">
+                <div className="font-display font-bold text-primary-text text-sm sm:text-base leading-snug">
                   {selectedTask.title}
                 </div>
                 {selectedTask.description && (
-                  <p className="text-gray-400 text-xs leading-relaxed whitespace-pre-wrap">
+                  <p className="text-secondary-text text-xs leading-relaxed whitespace-pre-wrap">
                     {selectedTask.description}
                   </p>
                 )}
               </div>
 
               {/* Progress Slider */}
-              <div className="space-y-2 pt-2 border-t border-white/5">
-                <div className="flex justify-between items-center text-xs text-gray-400">
+              <div className="space-y-2 pt-2 border-t border-border-main">
+                <div className="flex justify-between items-center text-xs text-secondary-text">
                   <span>Completed Effort:</span>
-                  <span className="font-mono text-white font-medium">{selectedTask.completedHours}h / {selectedTask.estimatedHours}h</span>
+                  <span className="font-mono text-primary-text font-medium">{selectedTask.completedHours}h / {selectedTask.estimatedHours}h</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <input 
@@ -335,19 +335,19 @@ export const Tasks: React.FC = () => {
                     step="0.5"
                     value={selectedTask.completedHours}
                     onChange={(e) => updateTaskProgress(selectedTask.id, parseFloat(e.target.value) - selectedTask.completedHours)}
-                    className="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                    className="w-full h-1.5 bg-secondary-bg rounded-lg appearance-none cursor-pointer accent-accent"
                   />
                 </div>
               </div>
 
               {/* Critical diagnostics block */}
-              <div className="space-y-3.5 pt-3 border-t border-white/5">
+              <div className="space-y-3.5 pt-3 border-t border-border-main">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-400">Deadline Risk Level:</span>
+                  <span className="text-secondary-text">Deadline Risk Level:</span>
                   <span className={`font-mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${
                     selectedTask.riskLevel === 'critical' ? 'text-red-400 bg-red-500/10 border-red-500/20' :
                     selectedTask.riskLevel === 'high' ? 'text-orange-400 bg-orange-500/10 border-orange-500/20' :
-                    'text-blue-400 bg-blue-500/10 border-blue-500/20'
+                    'text-accent bg-accent/10 border-accent/20'
                   }`}>
                     {selectedTask.riskLevel}
                   </span>
@@ -370,7 +370,7 @@ export const Tasks: React.FC = () => {
                     <button 
                       id={`breakdown-btn-${selectedTask.id}`}
                       onClick={() => triggerTaskBreakdown(selectedTask.id)}
-                      className="w-full py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 font-semibold text-xs hover:bg-blue-500/15 transition flex items-center justify-center space-x-1.5"
+                      className="w-full py-2 rounded-xl bg-accent/10 border border-accent/20 text-accent font-semibold text-xs hover:bg-accent/15 transition flex items-center justify-center space-x-1.5"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>Autonomous Task Breakdown</span>
@@ -394,9 +394,9 @@ export const Tasks: React.FC = () => {
                         setIsSprintRunning(true);
                         setIsSprintModalOpen(true);
                       }}
-                      className="w-full py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold text-xs shadow-lg shadow-red-500/10 hover:opacity-95 transition flex items-center justify-center space-x-1.5"
+                      className="w-full py-2.5 rounded-xl bg-accent text-black font-bold text-xs shadow-lg shadow-accent/10 hover:opacity-95 transition flex items-center justify-center space-x-1.5"
                     >
-                      <Zap className="w-3.5 h-3.5 text-white animate-bounce" />
+                      <Zap className="w-3.5 h-3.5 text-black animate-bounce" />
                       <span>Activate Sprint Focus Room</span>
                     </button>
                   </div>
@@ -439,8 +439,8 @@ export const Tasks: React.FC = () => {
 
               {/* Subtasks listing */}
               {selectedTask.subtasks.length > 0 && (
-                <div className="space-y-2 bg-white/[0.02] border border-white/5 p-4 rounded-xl">
-                  <div className="text-xs font-semibold text-gray-200">Execution Checklist</div>
+                <div className="space-y-2 bg-white/[0.02] border border-border-main p-4 rounded-xl">
+                  <div className="text-xs font-semibold text-primary-text">Execution Checklist</div>
                   <div className="space-y-2">
                     {selectedTask.subtasks.map((st) => (
                       <div key={st.id} className="flex items-center space-x-2 text-xs">
@@ -451,7 +451,7 @@ export const Tasks: React.FC = () => {
                         >
                           {st.completed && <span className="text-[10px]">✓</span>}
                         </button>
-                        <span className={`${st.completed ? 'text-gray-500 line-through' : 'text-gray-200'}`}>
+                        <span className={`${st.completed ? 'text-secondary-text line-through' : 'text-primary-text'}`}>
                           {st.title}
                         </span>
                       </div>
@@ -462,9 +462,9 @@ export const Tasks: React.FC = () => {
 
             </div>
           ) : (
-            <div className="glass-panel p-6 rounded-2xl border-white/5 text-center py-16 space-y-2">
-              <HelpCircle className="w-8 h-8 text-gray-600 mx-auto" />
-              <div className="text-gray-400 text-xs">Select a task from the list to view diagnostic tools and rescue plans.</div>
+            <div className="glass-panel p-6 rounded-2xl border-border-main text-center py-16 space-y-2">
+              <HelpCircle className="w-8 h-8 text-secondary-text mx-auto" />
+              <div className="text-secondary-text text-xs">Select a task from the list to view diagnostic tools and rescue plans.</div>
             </div>
           )}
         </div>
@@ -474,7 +474,7 @@ export const Tasks: React.FC = () => {
       {/* Interactive Sprint Focus Companion Modal */}
       {isSprintModalOpen && selectedTask && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-[#0b0f19] border border-white/10 rounded-2xl w-full max-w-xl p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
+          <div className="bg-primary-bg border border-border-main rounded-2xl w-full max-w-xl p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
             {/* Visual background glow elements */}
             <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-gradient-to-bl from-red-500/10 to-transparent pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-[200px] h-[200px] bg-gradient-to-tr from-orange-500/5 to-transparent pointer-events-none" />
@@ -486,7 +486,7 @@ export const Tasks: React.FC = () => {
                   <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
                   <span className="text-[10px] font-mono font-bold text-red-400 tracking-wider uppercase">HIGH-STAKES FOCUS ROOM</span>
                 </div>
-                <h3 className="font-display font-bold text-white text-lg sm:text-xl line-clamp-1">
+                <h3 className="font-display font-bold text-primary-text text-lg sm:text-xl line-clamp-1">
                   {selectedTask.title}
                 </h3>
               </div>
@@ -495,7 +495,7 @@ export const Tasks: React.FC = () => {
                   setIsSprintRunning(false);
                   setIsSprintModalOpen(false);
                 }}
-                className="p-1.5 bg-white/5 border border-white/10 text-gray-400 hover:text-white rounded-lg transition"
+                className="p-1.5 bg-white/5 border border-border-main text-secondary-text hover:text-primary-text rounded-lg transition"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -503,12 +503,12 @@ export const Tasks: React.FC = () => {
 
             {/* Main Visual Countdown Circle */}
             <div className="flex flex-col items-center justify-center py-4 relative z-10">
-              <div className="w-44 h-44 rounded-full border-4 border-red-500/20 flex flex-col items-center justify-center relative shadow-inner shadow-red-500/5 bg-[#080b13]">
+              <div className="w-44 h-44 rounded-full border-4 border-red-500/20 flex flex-col items-center justify-center relative shadow-inner shadow-red-500/5 bg-secondary-bg">
                 <div className="absolute inset-0 rounded-full border-4 border-red-500 border-t-transparent animate-spin duration-3000 opacity-60" style={{ animationDuration: '6s' }} />
-                <span className="text-3xl font-mono font-bold text-white tracking-widest">
+                <span className="text-3xl font-mono font-bold text-primary-text tracking-widest">
                   {formatSprintTime(sprintTimeLeft)}
                 </span>
-                <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest mt-1">Remaining Block</span>
+                <span className="text-[9px] font-mono text-secondary-text uppercase tracking-widest mt-1">Remaining Block</span>
               </div>
 
               {/* Timer Controls */}
@@ -525,7 +525,7 @@ export const Tasks: React.FC = () => {
                 </button>
                 <button 
                   onClick={() => setSprintTimeLeft(prev => prev + 300)}
-                  className="px-4 py-1.5 bg-white/5 text-gray-300 border border-white/5 hover:border-white/15 rounded-lg transition"
+                  className="px-4 py-1.5 bg-white/5 text-secondary-text border border-border-main hover:border-white/15 rounded-lg transition"
                 >
                   +5 Mins Boost
                 </button>
@@ -535,19 +535,19 @@ export const Tasks: React.FC = () => {
             {/* Study sound simulator & subtasks tracker */}
             <div className="space-y-4 relative z-10">
               {/* Binaural beats noise simulator */}
-              <div className="p-3.5 bg-white/[0.02] border border-white/5 rounded-xl flex items-center justify-between">
+              <div className="p-3.5 bg-white/[0.02] border border-border-main rounded-xl flex items-center justify-between">
                 <div className="flex items-center space-x-2.5">
-                  <div className={`p-2 rounded-lg ${isSoundPlaying ? 'bg-orange-500/20 text-orange-400 animate-pulse' : 'bg-slate-800/50 text-slate-400'}`}>
+                  <div className={`p-2 rounded-lg ${isSoundPlaying ? 'bg-orange-500/20 text-orange-400 animate-pulse' : 'bg-slate-800/50 text-secondary-text'}`}>
                     {isSoundPlaying ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                   </div>
                   <div className="space-y-0.5">
-                    <span className="text-xs font-semibold text-white">Binaural Study Beats Generator</span>
-                    <p className="text-[9px] text-gray-500">{isSoundPlaying ? 'Playing deep study flow frequencies (40Hz)' : 'Muted - Click trigger'}</p>
+                    <span className="text-xs font-semibold text-primary-text">Binaural Study Beats Generator</span>
+                    <p className="text-[9px] text-secondary-text">{isSoundPlaying ? 'Playing deep study flow frequencies (40Hz)' : 'Muted - Click trigger'}</p>
                   </div>
                 </div>
                 <button 
                   onClick={() => setIsSoundPlaying(!isSoundPlaying)}
-                  className="px-3 py-1 bg-[#141b2e] hover:bg-[#1a233c] text-orange-400 border border-orange-500/20 text-[10px] font-bold rounded transition"
+                  className="px-3 py-1 bg-surface hover:bg-white/5 text-orange-400 border border-orange-500/20 text-[10px] font-bold rounded transition"
                 >
                   {isSoundPlaying ? 'Deactivate' : 'Activate'}
                 </button>
@@ -555,22 +555,22 @@ export const Tasks: React.FC = () => {
 
               {/* Subtask listing with checking */}
               <div className="space-y-2">
-                <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400">Current Study Milestones</span>
+                <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-secondary-text">Current Study Milestones</span>
                 <div className="space-y-2 max-h-[140px] overflow-y-auto pr-1">
                   {selectedTask.subtasks.length > 0 ? (
                     selectedTask.subtasks.map(st => (
-                      <div key={st.id} className="p-3 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between text-xs">
-                        <span className={`${st.completed ? 'text-slate-500 line-through' : 'text-slate-200'}`}>{st.title}</span>
+                      <div key={st.id} className="p-3 rounded-lg bg-black/40 border border-border-main flex items-center justify-between text-xs">
+                        <span className={`${st.completed ? 'text-secondary-text line-through' : 'text-primary-text'}`}>{st.title}</span>
                         <button 
                           onClick={() => toggleSubtaskStatus(selectedTask.id, st.id)}
-                          className={`px-2 py-0.5 rounded border text-[10px] transition ${st.completed ? 'bg-orange-500/10 border-orange-500/20 text-orange-400' : 'bg-white/5 border-white/10 text-gray-400'}`}
+                          className={`px-2 py-0.5 rounded border text-[10px] transition ${st.completed ? 'bg-orange-500/10 border-orange-500/20 text-orange-400' : 'bg-white/5 border-border-main text-secondary-text'}`}
                         >
                           {st.completed ? 'Finished' : 'Mark Complete'}
                         </button>
                       </div>
                     ))
                   ) : (
-                    <div className="p-4 text-center rounded-lg bg-black/20 border border-white/5 text-[11px] text-slate-500">
+                    <div className="p-4 text-center rounded-lg bg-black/20 border border-border-main text-[11px] text-secondary-text">
                       No milestones attached. Break down this task to unlock structural checklists!
                     </div>
                   )}
@@ -585,7 +585,7 @@ export const Tasks: React.FC = () => {
                   setIsSprintRunning(false);
                   setIsSprintModalOpen(false);
                 }}
-                className="w-1/3 py-2.5 bg-[#121624] border border-white/5 hover:bg-[#171d31] text-gray-400 hover:text-white rounded-xl text-xs font-semibold transition"
+                className="w-1/3 py-2.5 bg-surface border border-border-main hover:bg-white/5 text-secondary-text hover:text-primary-text rounded-xl text-xs font-semibold transition"
               >
                 Quit Focus
               </button>

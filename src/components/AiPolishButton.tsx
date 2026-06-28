@@ -47,7 +47,7 @@ export const AiPolishButton: React.FC<AiPolishButtonProps> = ({
       onClick={handlePolish}
       disabled={loading}
       title={tooltipText}
-      className={`p-1.5 rounded-lg border border-orange-500/20 bg-orange-500/10 hover:bg-orange-500/25 text-orange-400 hover:text-orange-300 transition-colors flex items-center justify-center cursor-pointer disabled:opacity-50 shrink-0 ${className}`}
+      className={`p-1.5 rounded-lg border border-accent/20 bg-accent/10 hover:bg-accent/25 text-accent hover:opacity-80 transition-colors flex items-center justify-center cursor-pointer disabled:opacity-50 shrink-0 ${className}`}
     >
       {loading ? (
         <Loader2 className="w-3.5 h-3.5 animate-spin" />

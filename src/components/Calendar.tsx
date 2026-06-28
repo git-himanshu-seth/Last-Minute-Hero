@@ -41,7 +41,7 @@ export const Calendar: React.FC = () => {
     
     // Empty cells before first day
     for (let i = 0; i < firstDayIndex; i++) {
-      cells.push(<div key={`empty-${i}`} className="min-h-24 bg-white/[0.01] border border-white/5 opacity-40" />);
+      cells.push(<div key={`empty-${i}`} className="min-h-24 bg-white/[0.01] border border-border-main opacity-40" />);
     }
 
     // Days cells
@@ -53,16 +53,16 @@ export const Calendar: React.FC = () => {
       cells.push(
         <div 
           key={day} 
-          className={`min-h-24 p-2 border border-white/5 flex flex-col justify-between transition ${
-            isToday ? 'bg-orange-500/5 border-orange-500/30' : 'bg-[#0a0d16]/30 hover:bg-white/[0.02]'
+          className={`min-h-24 p-2 border border-border-main flex flex-col justify-between transition ${
+            isToday ? 'bg-accent/5 border-accent/30' : 'bg-surface/30 hover:bg-white/[0.02]'
           }`}
         >
           <div className="flex justify-between items-center">
-            <span className={`text-[10px] font-mono font-bold ${isToday ? 'text-orange-400' : 'text-gray-400'}`}>
+            <span className={`text-[10px] font-mono font-bold ${isToday ? 'text-accent' : 'text-secondary-text'}`}>
               {day}
             </span>
             {isToday && (
-              <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-accent" />
             )}
           </div>
 
@@ -92,8 +92,8 @@ export const Calendar: React.FC = () => {
     <div className="space-y-6">
       {/* Title */}
       <div className="space-y-1">
-        <h2 className="font-display text-2xl font-bold text-white tracking-tight">Mission Schedule</h2>
-        <p className="text-gray-400 text-xs sm:text-sm">Visualize active deadlines, schedule risks, and dynamic pacing across the month.</p>
+        <h2 className="font-display text-2xl font-bold text-primary-text tracking-tight">Mission Schedule</h2>
+        <p className="text-secondary-text text-xs sm:text-sm">Visualize active deadlines, schedule risks, and dynamic pacing across the month.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

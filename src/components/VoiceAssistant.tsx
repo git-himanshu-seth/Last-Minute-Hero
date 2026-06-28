@@ -89,14 +89,14 @@ export const VoiceAssistant: React.FC = () => {
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Title */}
       <div className="space-y-1">
-        <h2 className="font-display text-2xl font-bold text-white tracking-tight">AI Voice Assistant</h2>
-        <p className="text-gray-400 text-xs sm:text-sm">Speak or chat with Gemini Live-style audio coach. Receives natural commands and coordinates schedules.</p>
+        <h2 className="font-display text-2xl font-bold text-primary-text tracking-tight">AI Voice Assistant</h2>
+        <p className="text-secondary-text text-xs sm:text-sm">Speak or chat with Gemini Live-style audio coach. Receives natural commands and coordinates schedules.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Assistant Main Panel (Col span 2) */}
-        <div className="lg:col-span-2 glass-panel p-6 sm:p-8 rounded-2xl border-white/5 space-y-6 flex flex-col justify-between min-h-[400px]">
+        <div className="lg:col-span-2 glass-panel p-6 sm:p-8 rounded-2xl border-border-main space-y-6 flex flex-col justify-between min-h-[400px]">
           
           {/* Header Controls */}
           <div className="flex justify-between items-center pb-4 border-b border-white/5">
@@ -147,7 +147,7 @@ export const VoiceAssistant: React.FC = () => {
             {/* Response area */}
             <div className="text-center space-y-2 max-w-md px-4">
               {response ? (
-                <p className="text-gray-100 text-sm leading-relaxed font-medium">
+                <p className="text-primary-text text-sm leading-relaxed font-medium">
                   "{response}"
                 </p>
               ) : (
@@ -177,7 +177,7 @@ export const VoiceAssistant: React.FC = () => {
               value={query} 
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Ask the AI coach anything..."
-              className="w-full bg-[#0a0d16] border border-white/10 rounded-xl pl-4 pr-12 py-3.5 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-orange-500/50"
+              className="w-full bg-surface border border-border-main rounded-xl pl-4 pr-12 py-3.5 text-xs text-primary-text placeholder-secondary-text focus:outline-none focus:border-accent/50"
             />
             <button 
               id="voice-assistant-submit"
