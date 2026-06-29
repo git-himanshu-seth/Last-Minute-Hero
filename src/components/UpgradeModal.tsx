@@ -74,7 +74,7 @@ export const UpgradeModal: React.FC = () => {
       name: 'Free Tier',
       tagline: 'Basic task mapping',
       price: '0',
-      description: 'Ideal for testing out Lifesaver AI and basic lists.',
+      description: 'Ideal for testing out Success Scheduler and basic lists.',
       features: [
         'Strict limit of 5 Tasks maximum',
         'Limit of 3 AI Assistant suggestions',
@@ -156,7 +156,7 @@ export const UpgradeModal: React.FC = () => {
               </span>
             </div>
             <h2 className="text-2xl font-display font-bold text-white tracking-tight">
-              Synchronize Lifesaver AI Subscription
+              Synchronize Success Scheduler Subscription
             </h2>
             <p className="text-xs text-slate-400 max-w-xl">
               You are currently on the <span className="text-orange-400 font-semibold">{currentPlan.toUpperCase()} Plan</span>.

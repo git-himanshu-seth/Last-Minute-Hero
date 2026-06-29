@@ -8,7 +8,8 @@ import {
   Sparkles, 
   CheckCircle,
   HelpCircle,
-  AlertCircle
+  AlertCircle,
+  Target
 } from 'lucide-react';
 
 export const SimulatedCheckout: React.FC = () => {
@@ -93,11 +94,11 @@ export const SimulatedCheckout: React.FC = () => {
             Back to Command Center
           </button>
           <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 bg-orange-500 rounded flex items-center justify-center font-bold text-black text-xs shrink-0">
-              !
+            <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center text-white text-xs shrink-0">
+              <Target className="w-4 h-4" />
             </div>
             <span className="font-display font-semibold text-xs tracking-tight text-white">
-              Lifesaver AI checkout
+              Success Scheduler checkout
             </span>
           </div>
         </div>
@@ -115,7 +116,7 @@ export const SimulatedCheckout: React.FC = () => {
                   Developer Sandbox Mode
                 </span>
                 <h2 className="text-xl font-display font-bold text-white tracking-tight">Order Summary</h2>
-                <p className="text-xs text-slate-400">You are completing checkout for your Lifesaver AI premium subscription.</p>
+                <p className="text-xs text-slate-400">You are completing checkout for your Success Scheduler premium subscription.</p>
               </div>
 
               {/* Plan Box */}
@@ -264,7 +265,7 @@ export const SimulatedCheckout: React.FC = () => {
 
       {/* Footer */}
       <footer className="h-12 border-t border-white/5 flex items-center justify-center text-[10px] text-slate-600 bg-[#040406]">
-        © 2026 Lifesaver AI. Stripe Sandbox Simulation Mode.
+        © 2026 Success Scheduler. Stripe Sandbox Simulation Mode.
       </footer>
     </div>
   );

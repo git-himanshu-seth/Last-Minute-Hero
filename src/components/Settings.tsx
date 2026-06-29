@@ -62,7 +62,7 @@ export const Settings: React.FC = () => {
     city: user?.city || 'San Francisco',
     timezone: user?.timezone || 'America/Los_Angeles',
     occupation: user?.occupation || 'Full Stack Engineer',
-    organization: user?.organization || 'Lifesaver Studio',
+    organization: user?.organization || 'Success Scheduler Studio',
     education: user?.education || 'B.S. Computer Science',
     bio: user?.bio || 'Passionate developer struggling with midnight crunches. Always looking for smart ways to cheat procrastination.',
     photoUrl: user?.photoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop',
@@ -94,7 +94,7 @@ export const Settings: React.FC = () => {
         city: user.city || 'San Francisco',
         timezone: user.timezone || 'America/Los_Angeles',
         occupation: user.occupation || 'Full Stack Engineer',
-        organization: user.organization || 'Lifesaver Studio',
+        organization: user.organization || 'Success Scheduler Studio',
         education: user.education || 'B.S. Computer Science',
         bio: user.bio || 'Passionate developer struggling with midnight crunches. Always looking for smart ways to cheat procrastination.',
         photoUrl: user.photoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop',
@@ -300,7 +300,7 @@ export const Settings: React.FC = () => {
         icon: 'Briefcase',
         items: ['Groom the product backlog list', 'Sync with frontend designers', 'Execute weekly deployment pipeline tests', 'Review user telemetry reports'],
         habits: ['Update Jira ticket logs', 'Review high priority issues at sunrise'],
-        goals: ['Launch Lifesaver v2 on Cloud Run']
+        goals: ['Launch Success Scheduler v2 on Cloud Run']
       },
       {
         title: 'Team Product Launch Plan',

@@ -71,11 +71,11 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ isOpen, onClose }
       {/* Sidebar Header Brand */}
       <div className="p-5.5 border-b border-border-main flex items-center justify-between">
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center font-bold text-black shadow-md shadow-red-500/10 shrink-0">
-            !
+          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white shadow-md shadow-blue-500/10 shrink-0">
+            <Target className="w-5 h-5" />
           </div>
           <span className="font-display font-semibold text-sm tracking-tight text-[var(--text-primary)] leading-tight">
-            Lifesaver AI<br/>
+            Success Scheduler<br/>
             <span className="text-[var(--text-secondary)] font-medium text-[10px]">Command Center</span>
           </span>
         </div>

@@ -53,7 +53,7 @@ export const Dashboard: React.FC = () => {
 
   const handleShare = (platform: 'linkedin' | 'facebook' | 'whatsapp', badge: any) => {
     const appUrl = window.location.href;
-    const text = `🏆 Achievement Unlocked! I just earned the '${badge.name}' badge on Last Minute Life Saver AI! 🚀\n"${badge.description}"\nRescue your schedules and track your performance here:`;
+    const text = `🏆 Achievement Unlocked! I just earned the '${badge.name}' badge on Success Scheduler AI! 🚀\n"${badge.description}"\nRescue your schedules and track your performance here:`;
     
     let shareUrl = '';
     if (platform === 'linkedin') {

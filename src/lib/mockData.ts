@@ -45,7 +45,7 @@ export const ALL_MOCK_BADGES: Badge[] = [
   },
   {
     id: 'team-hero',
-    name: 'Team Lifesaver',
+    name: 'Team Success Scheduler',
     description: 'Shared workload with a teammate during a critical group sprint.',
     icon: 'Users',
     category: 'team'

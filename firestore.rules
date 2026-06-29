@@ -108,49 +108,49 @@ service cloud.firestore {
     }
 
     match /tasks/{taskId} {
-      allow read: if isRequestOwner(resource.data.userId);
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if isRequestOwner(request.resource.data.userId) && isValidTask(request.resource.data);
       allow update: if isRequestOwner(resource.data.userId) && isRequestOwner(request.resource.data.userId) && isValidTask(request.resource.data);
       allow delete: if isRequestOwner(resource.data.userId);
     }
 
     match /goals/{goalId} {
-      allow read: if isRequestOwner(resource.data.userId);
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if isRequestOwner(request.resource.data.userId) && isValidGoal(request.resource.data);
       allow update: if isRequestOwner(resource.data.userId) && isRequestOwner(request.resource.data.userId) && isValidGoal(request.resource.data);
       allow delete: if isRequestOwner(resource.data.userId);
     }
 
     match /habits/{habitId} {
-      allow read: if isRequestOwner(resource.data.userId);
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if isRequestOwner(request.resource.data.userId) && isValidHabit(request.resource.data);
       allow update: if isRequestOwner(resource.data.userId) && isRequestOwner(request.resource.data.userId) && isValidHabit(request.resource.data);
       allow delete: if isRequestOwner(resource.data.userId);
     }
 
     match /dailyPlans/{planId} {
-      allow read: if resource == null || isRequestOwner(resource.data.userId);
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if isRequestOwner(request.resource.data.userId) && isValidDailyPlan(request.resource.data);
       allow update: if isRequestOwner(resource.data.userId) && isRequestOwner(request.resource.data.userId) && isValidDailyPlan(request.resource.data);
       allow delete: if isRequestOwner(resource.data.userId);
     }
 
     match /productivityReports/{reportId} {
-      allow read: if isRequestOwner(resource.data.userId);
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if isRequestOwner(request.resource.data.userId) && isValidProductivityReport(request.resource.data);
       allow update: if isRequestOwner(resource.data.userId) && isRequestOwner(request.resource.data.userId) && isValidProductivityReport(request.resource.data);
       allow delete: if isRequestOwner(resource.data.userId);
     }
 
     match /notifications/{notifId} {
-      allow read: if isRequestOwner(resource.data.userId);
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if isRequestOwner(request.resource.data.userId) && isValidAppNotification(request.resource.data);
       allow update: if isRequestOwner(resource.data.userId) && isRequestOwner(request.resource.data.userId) && isValidAppNotification(request.resource.data);
       allow delete: if isRequestOwner(resource.data.userId);
     }
 
     match /strategyPlans/{planId} {
-      allow read: if isRequestOwner(resource.data.userId);
+      allow read: if isSignedIn();
       allow create: if isRequestOwner(request.resource.data.userId) && isValidStrategyPlan(request.resource.data);
       allow update: if isRequestOwner(resource.data.userId) && isRequestOwner(request.resource.data.userId) && isValidStrategyPlan(request.resource.data);
       allow delete: if isRequestOwner(resource.data.userId);

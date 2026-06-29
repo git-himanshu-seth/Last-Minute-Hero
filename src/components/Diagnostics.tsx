@@ -1317,7 +1317,7 @@ assert.equal(notifications.length, 1, "Dispatched notification for high-hazard s
                               {log.status === 503 && (
                                 <>
                                   <strong className="text-amber-400">Gemini High-Demand Error Fallback:</strong> The Gemini API is currently experiencing a temporary capacity spike. 
-                                  Last Minute Life Saver mitigates this automatically by intercepting the failure, performing an exponential delay backoff, and re-routing the prompt to our lighter fallback models (<code className="text-cyan-300">gemini-3.1-flash-lite</code> / <code className="text-cyan-300">gemini-3.1-flash-lite</code>). 
+                                  Success Scheduler mitigates this automatically by intercepting the failure, performing an exponential delay backoff, and re-routing the prompt to our lighter fallback models (<code className="text-cyan-300">gemini-3.1-flash-lite</code> / <code className="text-cyan-300">gemini-3.1-flash-lite</code>). 
                                   This guarantees zero downtime and ensures user workflows are saved.
                                 </>
                               )}

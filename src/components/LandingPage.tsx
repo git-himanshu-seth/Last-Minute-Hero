@@ -109,8 +109,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartDemo, onLogin, 
         }
       }
     } catch (err: any) {
-      setAuthError(err.message || 'Authentication failed. Please verify credentials.');
-      showToast(err.message || 'Authentication failed.', 'error');
+      if (err.code === 'auth/operation-not-allowed' || (err.message && err.message.includes('operation-not-allowed'))) {
+        setAuthError(
+          '🔒 Email/Password Sign-up is not enabled in your Firebase project.\n\n' +
+          'To enable it:\n' +
+          '1. Go to your Firebase Console (console.firebase.google.com)\n' +
+          '2. Navigate to "Authentication" > "Sign-in method"\n' +
+          '3. Click "Add new provider" > select "Email/Password" and click Enable.\n\n' +
+          'Alternatively, you can sign in instantly using the "Sign In with Google" button below!'
+        );
+        showToast('Email/Password provider is currently disabled in your Firebase console.', 'error');
+      } else {
+        setAuthError(err.message || 'Authentication failed. Please verify credentials.');
+        showToast(err.message || 'Authentication failed.', 'error');
+      }
     } finally {
       setAuthLoading(false);
     }
@@ -129,7 +141,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartDemo, onLogin, 
             <Clock className="w-5.5 h-5.5 text-black stroke-[2.5]" />
           </div>
           <span className="font-display font-bold text-lg tracking-tight text-primary-text">
-            Life Saver AI
+            Success Scheduler
           </span>
         </div>
         <div className="flex items-center space-x-4">
@@ -185,7 +197,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartDemo, onLogin, 
           transition={{ duration: 0.6, delay: 0.2 }}
           className="max-w-2xl mx-auto text-secondary-text text-sm sm:text-base mb-10 leading-relaxed font-sans"
         >
-          Stop ignoring passive reminders. Life Saver AI predicts deadline risk, isolates procrastination root causes, and automatically generates hour-by-hour Emergency Rescue Plans.
+          Stop ignoring passive reminders. Success Scheduler predicts deadline risk, isolates procrastination root causes, and automatically generates hour-by-hour Emergency Rescue Plans.
         </motion.p>
 
         <motion.div 
@@ -283,7 +295,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartDemo, onLogin, 
             <div className="flex justify-between items-center relative z-10">
               <div className="space-y-1">
                 <h3 className="font-display font-bold text-white text-lg">
-                  {isSignUp ? 'Create Lifesaver Account' : 'Welcome Back'}
+                  {isSignUp ? 'Create Success Scheduler Account' : 'Welcome Back'}
                 </h3>
                 <p className="text-xs text-gray-400">
                   {isSignUp ? 'Sign up to rescue high-stakes missions' : 'Sign in to access your command center'}
@@ -322,8 +334,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartDemo, onLogin, 
             </div>
 
             {authError && (
-              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 leading-normal">
-                {authError}
+              <div className="space-y-3">
+                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 leading-normal whitespace-pre-line">
+                  {authError}
+                </div>
+                {(authError.includes('Firebase') || authError.includes('operation-not-allowed') || authError.includes('not enabled')) && (
+                  <button
+                    type="button"
+                    onClick={onStartDemo}
+                    className="w-full py-2.5 rounded-xl bg-orange-500 text-black font-bold text-xs hover:opacity-90 transition duration-200 shadow-lg shadow-orange-500/10 flex items-center justify-center gap-2"
+                  >
+                    🚀 Enter Instantly as Guest (Demo Mode)
+                  </button>
+                )}
               </div>
             )}
 
@@ -454,7 +477,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartDemo, onLogin, 
 
       {/* Simple footer */}
       <footer className="py-10 border-t border-gray-900/60 text-center relative z-10 text-gray-600 text-xs">
-        &copy; 2026 Last Minute Life Saver. Built for Google AI Studio Hackathon. Powered by Google Gemini 2.5 Flash.
+        &copy; 2026 Success Scheduler. Built for Google AI Studio Hackathon. Powered by Google Gemini 2.5 Flash.
       </footer>
     </div>
   );

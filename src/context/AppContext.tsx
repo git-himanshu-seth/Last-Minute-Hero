@@ -304,7 +304,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setActiveTab('dashboard');
       }
     } catch (err) {
-      if (err instanceof Error && 'code' in err && (err as any).code === 'auth/cancelled-popup-request') {
+      if (err instanceof Error && 'code' in err && ((err as any).code === 'auth/cancelled-popup-request' || (err as any).code === 'auth/popup-closed-by-user')) {
         showToast('Authentication cancelled. Please try again.', 'info');
       } else {
         console.error("Google Auth Error:", err);
@@ -491,6 +491,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setLoading(true);
     setIsDemo(false);
     try {
+      await signOut(auth);
       const credential = await createUserWithEmailAndPassword(auth, email, password);
       const fUser = credential.user;
 
@@ -517,7 +518,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       showToast('Account created successfully! Welcome!', 'success');
       
       // Auto trigger first responder badge on register
-      const msg = `🎉 Welcome to Last Minute Life Saver, ${name}! Your credentials account has been successfully created.`;
+      const msg = `🎉 Welcome to Success Scheduler, ${name}! Your credentials account has been successfully created.`;
       const notif: AppNotification = {
         id: `notif-${Date.now()}`,
         userId: fUser.uid,
@@ -536,6 +537,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         friendlyError = 'Invalid email address format.';
       } else if (err.code === 'auth/weak-password') {
         friendlyError = 'Password must be at least 6 characters.';
+      } else if (err.code === 'auth/operation-not-allowed') {
+        friendlyError = 'Email/Password sign-up is not enabled in your Firebase project. Please enable it in your Firebase Console.';
       }
       showToast(friendlyError, 'error');
       throw new Error(friendlyError);

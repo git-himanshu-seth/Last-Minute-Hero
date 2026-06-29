@@ -1,6 +1,6 @@
 {
-  "name": "Last Minute Life Saver",
+  "name": "Success Scheduler",
   "description": "An AI-powered collaborative productivity companion that predicts deadline risks, manages group sprints, facilitates simulated and AI-guided chats, and automates daily standups to help teams deliver on time.",
-  "requestFramePermissions": [],
+  "requestFramePermissions": ["camera", "microphone"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

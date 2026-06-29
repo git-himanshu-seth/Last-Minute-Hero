@@ -50,6 +50,7 @@ interface Member {
   skills: string[];
   workload: number; // 0-100%
   availability: string;
+  email?: string;
 }
 
 interface Group {
@@ -188,10 +189,17 @@ export const Workspace: React.FC = () => {
   });
   const [selectedChannelId, setSelectedChannelId] = useState<string>('c1');
 
-  const [messages, setMessages] = useState<ChatMessage[]>(() => {
-    const saved = localStorage.getItem('lifesaver_ai_messages');
-    return saved ? JSON.parse(saved) : initialMessages;
-  });
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+
+  // Audio recording state
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const recordIntervalRef = useRef<number | null>(null);
+
+  // File upload state
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // State for AI Coaches
   const [coachReport, setCoachReport] = useState<any>(null);
@@ -214,9 +222,7 @@ export const Workspace: React.FC = () => {
     localStorage.setItem('lifesaver_ai_channels', JSON.stringify(channels));
   }, [channels]);
 
-  useEffect(() => {
-    localStorage.setItem('lifesaver_ai_messages', JSON.stringify(messages));
-  }, [messages]);
+
 
   const activeGroup = groups.find(g => g.id === selectedGroupId) || groups[0];
   const activeChannel = channels.find(c => c.id === selectedChannelId) || channels[0];
@@ -512,7 +518,16 @@ export const Workspace: React.FC = () => {
   // ==========================================
   const [typedMessage, setTypedMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const chatBottomRef = useRef<HTMLDivElement>(null);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isTyping]);
 
   useEffect(() => {
     if (!activeGroup?.id || !activeChannel?.id) return;
@@ -539,10 +554,6 @@ export const Workspace: React.FC = () => {
     });
     return () => unsub();
   }, [activeGroup?.id, activeChannel?.id]);
-
-  useEffect(() => {
-    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -636,32 +647,82 @@ export const Workspace: React.FC = () => {
     }));
   };
 
-  const handleSimulateVoiceMsg = () => {
-    const audioMsg: ChatMessage = {
-      id: 'voice_' + Date.now(),
-      channelId: selectedChannelId,
-      senderName: 'David',
-      senderAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop',
-      isAI: false,
-      content: '🎙️ Shared a voice message',
-      audioDuration: '0:14',
-      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-    };
-    setMessages(prev => [...prev, audioMsg]);
+  const handleVoiceNoteClick = async () => {
+    if (isRecording) {
+      if (mediaRecorderRef.current) {
+        mediaRecorderRef.current.stop();
+      }
+      setIsRecording(false);
+      if (recordIntervalRef.current) clearInterval(recordIntervalRef.current);
+    } else {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mediaRecorder = new MediaRecorder(stream);
+        mediaRecorderRef.current = mediaRecorder;
+        audioChunksRef.current = [];
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) audioChunksRef.current.push(e.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          const durationStr = `${Math.floor(recordingTime / 60)}:${(recordingTime % 60).toString().padStart(2, '0')}`;
+          const audioMsg: ChatMessage = {
+            id: 'voice_' + Date.now(),
+            channelId: selectedChannelId,
+            senderName: user?.name || 'Sarah',
+            senderAvatar: user?.photoUrl || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
+            isAI: false,
+            content: '🎙️ Shared a voice message',
+            audioDuration: durationStr,
+            timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+          };
+          setMessages(prev => [...prev, audioMsg]);
+          saveGroupMessage(activeGroup.id, selectedChannelId, audioMsg);
+          
+          stream.getTracks().forEach(track => track.stop());
+        };
+
+        mediaRecorder.start();
+        setIsRecording(true);
+        setRecordingTime(0);
+        
+        recordIntervalRef.current = window.setInterval(() => {
+          setRecordingTime(prev => prev + 1);
+        }, 1000);
+      } catch (err) {
+        console.error("Error accessing microphone", err);
+        alert("Microphone permission denied.");
+      }
+    }
   };
 
-  const handleSimulateFileShare = () => {
+  const handleFileShare = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const sizeStr = file.size > 1024 * 1024 
+      ? (file.size / 1024 / 1024).toFixed(2) + ' MB'
+      : (file.size / 1024).toFixed(2) + ' KB';
+
     const fileMsg: ChatMessage = {
       id: 'file_' + Date.now(),
       channelId: selectedChannelId,
-      senderName: 'Sarah',
-      senderAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
+      senderName: user?.name || 'Sarah',
+      senderAvatar: user?.photoUrl || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
       isAI: false,
-      content: '📁 Shared a schematic specification',
-      attachment: { name: 'system_architecture_diagram.pdf', size: '2.4 MB', type: 'PDF Document' },
+      content: `📁 Shared a file: ${file.name}`,
+      attachment: { name: file.name, size: sizeStr, type: file.type || 'Document' },
       timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     };
     setMessages(prev => [...prev, fileMsg]);
+    saveGroupMessage(activeGroup.id, selectedChannelId, fileMsg);
+    
+    e.target.value = '';
   };
 
   // ==========================================
@@ -731,7 +792,7 @@ export const Workspace: React.FC = () => {
   const [micMuted, setMicMuted] = useState(false);
   const [videoMuted, setVideoMuted] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
+  const [isCallRecording, setIsCallRecording] = useState(false);
 
   // Standup states
   const [showStandupModal, setShowStandupModal] = useState(false);
@@ -996,8 +1057,7 @@ Sarah: Perfect. John, assign David to the calendar test task. Let’s target our
           { id: 'sprint', label: 'Sprint Board', icon: Kanban },
           { id: 'goals', label: 'Team Milestones', icon: Target },
           { id: 'chat', label: 'Team Chat', icon: MessageSquare },
-          { id: 'calls', label: 'Voice & Video Calling', icon: Video },
-          { id: 'coach', label: 'AI Risk Coach', icon: Cpu },
+          { id: 'calls', label: 'Standups & Video', icon: Video },
           { id: 'google-sync', label: 'Google Workspace Sync', icon: Sparkles },
         ].map((tab) => {
           const Icon = tab.icon;
@@ -1546,9 +1606,9 @@ Sarah: Perfect. John, assign David to the calendar test task. Let’s target our
 
         {/* TAB 5: REAL-TIME TEAM CHAT */}
         {activeSubTab === 'chat' && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-[#08080a] rounded-2xl border border-white/5 overflow-hidden h-[520px]">
+          <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-[minmax(150px,auto)_1fr] md:grid-rows-1 gap-4 bg-[#08080a] rounded-2xl border border-white/5 overflow-hidden h-[800px] md:h-[600px]">
             {/* Left Channel Sidebar */}
-            <div className="p-4 border-r border-white/5 flex flex-col gap-4 bg-[#0a0a0c]">
+            <div className="p-4 border-r border-white/5 flex flex-col gap-4 bg-[#0a0a0c] overflow-y-auto min-h-0">
               <div>
                 <h4 className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest mb-2.5">Channels</h4>
                 <div className="space-y-1">
@@ -1590,34 +1650,35 @@ Sarah: Perfect. John, assign David to the calendar test task. Let’s target our
             </div>
 
             {/* Chat Messages Panel */}
-            <div className="md:col-span-3 flex flex-col h-full bg-[#050505] relative">
+            <div className="md:col-span-3 flex flex-col h-full bg-[#050505] relative min-h-0 overflow-hidden">
               {/* Header */}
               <div className="p-4 border-b border-white/5 flex justify-between items-center bg-[#070709]">
                 <div>
                   <h4 className="text-xs font-semibold text-white"># {activeChannel.name}</h4>
-                  <p className="text-[9px] text-slate-500">Real-time collaborative room with active teammate simulation</p>
+                  <p className="text-[9px] text-slate-500">Real-time collaborative team chat</p>
                 </div>
 
                 <div className="flex gap-2">
+                  <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
                   <button
-                    onClick={handleSimulateFileShare}
+                    onClick={handleFileShare}
                     className="p-1.5 rounded bg-white/5 hover:bg-white/10 text-slate-300 text-[10px] flex items-center gap-1 font-semibold"
-                    title="Simulate file sharing"
+                    title="Send file asset"
                   >
                     📁 Share Doc
                   </button>
                   <button
-                    onClick={handleSimulateVoiceMsg}
-                    className="p-1.5 rounded bg-white/5 hover:bg-white/10 text-slate-300 text-[10px] flex items-center gap-1 font-semibold"
-                    title="Simulate voice message"
+                    onClick={handleVoiceNoteClick}
+                    className={`p-1.5 rounded ${isRecording ? 'bg-red-500/20 text-red-400 animate-pulse' : 'bg-white/5 hover:bg-white/10 text-slate-300'} text-[10px] flex items-center gap-1 font-semibold`}
+                    title={isRecording ? "Stop recording" : "Record voice message"}
                   >
-                    🎙️ Voice Note
+                    {isRecording ? `⏹️ Recording (${Math.floor(recordingTime / 60)}:${(recordingTime % 60).toString().padStart(2, '0')})` : '🎙️ Voice Note'}
                   </button>
                 </div>
               </div>
 
               {/* Messages Lists */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
                 {messages.filter(m => m.channelId === selectedChannelId).map((msg) => (
                   <div key={msg.id} className="flex gap-3 items-start group">
                     <img src={msg.senderAvatar} alt={msg.senderName} className="w-8.5 h-8.5 rounded-full object-cover border border-white/10" />
@@ -1711,7 +1772,7 @@ Sarah: Perfect. John, assign David to the calendar test task. Let’s target our
                     </div>
                   </div>
                 )}
-                <div ref={chatBottomRef} />
+                <div ref={messagesEndRef} />
               </div>
 
               {/* Message input */}
